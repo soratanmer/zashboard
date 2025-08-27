@@ -4,7 +4,7 @@
     :class="
       twMerge(
         'bg-base-200 flex cursor-pointer flex-col items-start rounded-md',
-        active ? 'bg-primary text-primary-content sm:hover:bg-primary/95' : 'sm:hover:bg-base-300',
+        active ? 'bg-primary sm:hover:bg-primary/95' : 'sm:hover:bg-base-300',
         isSmallCard ? 'gap-1 p-1' : 'gap-2 p-2',
         latencyTipAnimationClass,
       )
@@ -18,8 +18,17 @@
         :icon="node.icon"
         :fill="active ? 'fill-primary-content' : 'fill-base-content'"
       />
+      <!-- fix twemoji on ios -->
       <span
-        :class="twMerge('text-sm', truncateProxyName && 'truncate')"
+        v-if="active"
+        :class="twMerge('text-primary-content text-sm', truncateProxyName && 'truncate')"
+        @mouseenter="checkTruncation"
+      >
+        {{ node.name }}
+      </span>
+      <span
+        v-else
+        :class="twMerge('text-base-content text-sm', truncateProxyName && 'truncate')"
         @mouseenter="checkTruncation"
       >
         {{ node.name }}
