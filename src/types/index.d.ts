@@ -27,7 +27,7 @@ export type Config = {
   }
 }
 
-type History = {
+export type History = {
   time: string
   delay: number
 }[]

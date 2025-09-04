@@ -112,7 +112,7 @@
 
     option,
     optgroup {
-      @apply bg-base-100;
+      @apply backdrop-blur-sm;
     }
 
     .bg-base-200,
