@@ -196,6 +196,7 @@ const en = {
   remoteAddress: 'Remote address',
   themeName: 'Theme name',
   save: 'Save',
+  unsaved: 'Unsaved',
   moreDetails: 'More details',
   moreSettings: 'More settings',
   customIcon: 'Custom icon',

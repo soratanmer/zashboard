@@ -106,6 +106,7 @@ import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
 import { nextTick, onUnmounted, ref, watch } from 'vue'
 import {
   checkProfileContentAPI,
+  fetchJsonSchemaAPI,
   getProfileContentAPI,
   getRuntimeProfileContentAPI,
   writeProfileContentAPI,
@@ -164,6 +165,22 @@ const parseJsonTopLevelNodes = (jsonContent: string) => {
   }
 }
 
+const loadJsonSchema = async (): Promise<any> => {
+  try {
+    const result = await fetchJsonSchemaAPI()
+
+    if (!result.success) {
+      console.warn('Failed to load JSON schema:', result.error)
+      return null
+    }
+
+    return result.data
+  } catch (error) {
+    console.warn('Failed to load JSON schema:', error)
+    return null
+  }
+}
+
 const scrollToNode = (nodeName: string) => {
   if (!editor) return
 
@@ -215,6 +232,27 @@ const initEditor = async () => {
       handleProfileChange()
     }
   })
+
+  loadJsonSchema()
+    .then((schema) => {
+      if (schema && editor) {
+        monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+          validate: true,
+          allowComments: false,
+          enableSchemaRequest: true,
+          schemas: [
+            {
+              uri: '',
+              fileMatch: ['*'],
+              schema: schema,
+            },
+          ],
+        })
+      }
+    })
+    .catch((error) => {
+      console.warn('Failed to load JSON schema for editor:', error)
+    })
 }
 
 const initProfile = async () => {
@@ -244,8 +282,10 @@ const handleProfileChange = () => {
   parseJsonTopLevelNodes(profileContent.value)
 }
 
-const handleProfileReset = () => {
-  initProfile()
+const handleProfileReset = async () => {
+  await initProfile()
+  await nextTick()
+  await initEditor()
 }
 
 const handleProfileCheck = async () => {

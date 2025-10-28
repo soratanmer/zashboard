@@ -4,6 +4,7 @@ import {
   DELETE_PROFILE,
   DISABLE_AUTO_LAUNCH,
   ENABLE_AUTO_LAUNCH,
+  FETCH_JSON_SCHEMA,
   GET_ACTIVE_PROFILE,
   GET_PROFILE_CONTENT,
   GET_RUNTIME_PROFILE_CONTENT,
@@ -110,4 +111,8 @@ export const updateCoreFromFileAPI = async (filePath: string): Promise<string> =
 
 export const selectCoreFileAPI = async (): Promise<string | null> => {
   return await api.invoke(SELECT_CORE_FILE)
+}
+
+export const fetchJsonSchemaAPI = async (): Promise<any> => {
+  return await api.invoke(FETCH_JSON_SCHEMA)
 }
