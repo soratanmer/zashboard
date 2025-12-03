@@ -11,10 +11,13 @@
     "
     @contextmenu.stop.prevent="handlerLatencyTest"
   >
-    <div class="flex w-full flex-1 items-center">
+    <div
+      class="w-full flex-1"
+      :class="truncateProxyName ? 'flex items-center' : 'leading-4'"
+    >
       <ProxyIcon
         v-if="node?.icon"
-        class="shrink-0"
+        class="inline-block shrink-0"
         :icon="node.icon"
         :fill="active ? 'fill-primary-content' : 'fill-base-content'"
       />
