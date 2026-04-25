@@ -21,7 +21,7 @@
             ref="menuItemRefs"
             :data-key="item.key"
             :id="`menu-item-${item.key}`"
-            class="btn btn-ghost btn-sm my-1 flex-1"
+            class="btn btn-ghost btn-sm my-1 h-8! flex-1 p-0!"
             :class="[
               !showActiveIndicator
                 ? 'hover:btn hover:btn-neutral'

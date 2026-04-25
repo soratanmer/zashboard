@@ -1,5 +1,5 @@
 import { DETECT_TRAY_STORE_UPDATED } from '@main/shared/event'
-import { computed, unref, watch } from 'vue'
+import { computed, watch } from 'vue'
 import { selectProxyAPI } from '../api'
 import { updateTrayStoreAPI } from '../api/ipc-invoke'
 import { addMessageListener } from '../api/ipc-message'
@@ -17,7 +17,7 @@ const proxyGroupsForTray = computed(() => {
 watch(
   proxyGroupsForTray,
   (newVal) => {
-    updateTrayStoreAPI('proxyGroups', unref(newVal))
+    updateTrayStoreAPI('proxyGroups', newVal)
   },
   {
     deep: true,
@@ -32,7 +32,7 @@ const configForTray = computed(() => {
 })
 
 watch(configForTray, (newVal) => {
-  updateTrayStoreAPI('config', unref(newVal))
+  updateTrayStoreAPI('config', newVal)
 })
 
 addMessageListener(DETECT_TRAY_STORE_UPDATED, async (data: { key: string; value: unknown }) => {

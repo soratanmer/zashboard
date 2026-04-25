@@ -79,7 +79,7 @@ const zhTW: LANG_MESSAGE = {
   updateConfigs: '更新配置',
   updateConfigsSuccess: '配置更新成功',
   configFilePath: '配置檔案路徑',
-  configFilePathPlaceholder: '絕對路徑，例如 /etc/mihomo/config.yaml',
+  configFilePathPlaceholder: '絕對路徑，例如 /etc/sing-box/config.json',
   configPayload: '配置內容',
   configPayloadPlaceholder: '在此貼上 YAML 配置內容...',
   forceUpdate: '強制更新',

@@ -1,20 +1,26 @@
 import {
   deleteProfileAPI,
+  getProfilesSnapshotAPI,
+  ProfilesSnapshot,
   saveProfileAPI,
   setActiveProfileAPI,
   updateProfileAPI,
   updateRemoteProfileAPI,
 } from '@/api/ipc-invoke'
 import { addMessageListener } from '@/api/ipc-message'
-import { PROFILE_LIST_UPDATED } from '@main/shared/event'
+import { PROFILES_SNAPSHOT_CHANGED } from '@main/shared/event'
 import { Profile } from '@main/shared/type'
 import { computed, ref } from 'vue'
 
 export const profileList = ref<Profile[]>([])
 
-addMessageListener<Profile[]>(PROFILE_LIST_UPDATED, (list) => {
-  profileList.value = list
-})
+const applyProfilesSnapshot = (snapshot: ProfilesSnapshot) => {
+  profileList.value = snapshot.profiles
+}
+
+getProfilesSnapshotAPI().then(applyProfilesSnapshot)
+
+addMessageListener<ProfilesSnapshot>(PROFILES_SNAPSHOT_CHANGED, applyProfilesSnapshot)
 
 export const activeProfileUuid = computed(
   () => profileList.value.find((f) => f.isActive)?.uuid || '',

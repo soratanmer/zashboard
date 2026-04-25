@@ -1,4 +1,3 @@
-import { MIHOMO } from '@/constant'
 import { showNotification } from '@/helper/notification'
 import { getUrlFromBackend } from '@/helper/utils'
 import { activeBackend, activeUuid } from '@/store/setup'
@@ -16,7 +15,8 @@ import axios, { AxiosError } from 'axios'
 import { debounce } from 'lodash-es'
 import ReconnectingWebSocket from 'reconnectingwebsocket'
 import { computed, nextTick, ref } from 'vue'
-import { CORE_VERSION } from '../../../shared/event'
+import { CORE_SNAPSHOT_CHANGED } from '../../../shared/event'
+import { CoreSnapshot, getCoreSnapshotAPI } from './ipc-invoke'
 import { addMessageListener } from './ipc-message'
 
 axios.interceptors.request.use((config) => {
@@ -59,28 +59,15 @@ axios.interceptors.response.use(
 export const version = ref()
 export const isCoreUpdateAvailable = ref(false)
 
-addMessageListener(CORE_VERSION, (value: string) => {
-  version.value = value
-})
+const applyCoreSnapshot = (snapshot: CoreSnapshot) => {
+  version.value = snapshot.version
+}
+
+getCoreSnapshotAPI().then(applyCoreSnapshot)
+
+addMessageListener<CoreSnapshot>(CORE_SNAPSHOT_CHANGED, applyCoreSnapshot)
 
 export const isSingBox = computed(() => true)
-export const mihomo = computed<[MIHOMO, string] | undefined>(() => {
-  if (!version.value || isSingBox.value) {
-    return undefined
-  }
-
-  const match = /(alpha-smart|alpha|beta|meta)-?(\w+)/.exec(version.value)
-  switch (match?.[1]) {
-    case 'alpha':
-      return [MIHOMO.Alpha, match[2] ?? version.value]
-    case 'alpha-smart':
-      return [MIHOMO.Smart, match[2] ?? version.value]
-    case 'meta':
-      return [MIHOMO.Meta, match[2] ?? version.value]
-    default:
-      return [MIHOMO.Meta, version.value]
-  }
-})
 export const zashboardVersion = ref(__APP_VERSION__)
 
 export const fetchProxiesAPI = () => {
@@ -375,8 +362,5 @@ const check = async (url: string, versionNumber: string) => {
 }
 
 export const fetchBackendUpdateAvailableAPI = async () => {
-  return await check(
-    MIHOMO_CHANNEL[mihomo.value?.[0] ?? MIHOMO.Meta].check_update_url,
-    mihomo.value?.[1] ?? version.value,
-  )
+  return await check('https://api.github.com/repos/SagerNet/sing-box/releases/latest', version.value)
 }

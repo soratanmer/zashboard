@@ -1,8 +1,9 @@
-const api = window.api
+import type { MessageChannel } from '@main/shared/ipc'
 
-export const addMessageListener = <T>(event: string, callback: (params: T) => void) => {
-  return api.on(event, (...args: unknown[]) => {
-    const params = args[1] as T
-    callback(params)
+const { pantheon } = window
+
+export const addMessageListener = <T>(event: MessageChannel, callback: (params: T) => void) => {
+  return pantheon.events.on(event, (params) => {
+    callback(params as T)
   })
 }

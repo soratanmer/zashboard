@@ -80,7 +80,7 @@ const zh: LANG_MESSAGE = {
   updateConfigs: '更新配置',
   updateConfigsSuccess: '配置更新成功',
   configFilePath: '配置文件路径',
-  configFilePathPlaceholder: '绝对路径，例如 /etc/mihomo/config.yaml',
+  configFilePathPlaceholder: '绝对路径，例如 /etc/sing-box/config.json',
   configPayload: '配置内容',
   configPayloadPlaceholder: '在此粘贴 YAML 配置内容...',
   forceUpdate: '强制更新',

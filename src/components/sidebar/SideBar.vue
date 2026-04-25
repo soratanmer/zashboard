@@ -13,14 +13,20 @@
           @mouseenter="(e) => mouseenterHandler(e, r)"
         >
           <a
-            :class="[r === route.name ? 'menu-active' : '', 'py-2']"
+            :class="[
+              r === route.name ? 'menu-active' : '',
+              isSidebarCollapsed && 'justify-center',
+              'py-2',
+            ]"
             @click.passive="() => router.push({ name: r })"
           >
             <component
               :is="ROUTE_ICON_MAP[r]"
               class="h-5 w-5"
             />
-            {{ $t(r) }}
+            <template v-if="!isSidebarCollapsed">
+              {{ $t(r) }}
+            </template>
           </a>
         </li>
       </ul>

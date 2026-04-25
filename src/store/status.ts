@@ -1,11 +1,12 @@
-import { getRuntimeProfileContentAPI } from '@/api/ipc-invoke'
-import { addMessageListener } from '@/api/ipc-message'
 import {
-  CORE_START_LOG,
-  IS_AUTO_LAUNCH_ENABLED,
-  IS_CORE_RUNNING,
-  IS_SYSTEM_PROXY_ENABLED,
-} from '@main/shared/event'
+  CoreSnapshot,
+  getCoreSnapshotAPI,
+  getRuntimeProfileContentAPI,
+  getSystemSnapshotAPI,
+  SystemSnapshot,
+} from '@/api/ipc-invoke'
+import { addMessageListener } from '@/api/ipc-message'
+import { CORE_SNAPSHOT_CHANGED, CORE_START_LOG, SYSTEM_SNAPSHOT_CHANGED } from '@main/shared/event'
 import { ref, watch } from 'vue'
 import { ROUTE_NAME } from '../constant'
 import router from '../router'
@@ -28,7 +29,7 @@ export const resetCoreLogs = () => {
   coreLogs.value = []
 }
 
-addMessageListener<boolean>(IS_CORE_RUNNING, async (isRunning) => {
+const applyCoreSnapshot = async ({ isRunning }: CoreSnapshot) => {
   backendList.value = []
   if (isRunning) {
     const runtimeConfigContent = await getRuntimeProfileContentAPI()
@@ -50,15 +51,18 @@ addMessageListener<boolean>(IS_CORE_RUNNING, async (isRunning) => {
     router.push({ name: ROUTE_NAME.profiles })
   }
   isCoreRunning.value = isRunning
-})
+}
 
-addMessageListener<boolean>(IS_SYSTEM_PROXY_ENABLED, (isEnabled) => {
-  isSystemProxyEnabled.value = isEnabled
-})
+const applySystemSnapshot = (snapshot: SystemSnapshot) => {
+  isSystemProxyEnabled.value = snapshot.isSystemProxyEnabled
+  isAutoLaunchEnabled.value = snapshot.isAutoLaunchEnabled
+}
 
-addMessageListener<boolean>(IS_AUTO_LAUNCH_ENABLED, (isEnabled) => {
-  isAutoLaunchEnabled.value = isEnabled
-})
+getCoreSnapshotAPI().then(applyCoreSnapshot)
+getSystemSnapshotAPI().then(applySystemSnapshot)
+
+addMessageListener<CoreSnapshot>(CORE_SNAPSHOT_CHANGED, applyCoreSnapshot)
+addMessageListener<SystemSnapshot>(SYSTEM_SNAPSHOT_CHANGED, applySystemSnapshot)
 
 addMessageListener<string>(CORE_START_LOG, (log) => {
   if (!showCoreStartupModal.value) {

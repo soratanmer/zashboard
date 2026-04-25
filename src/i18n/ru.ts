@@ -80,7 +80,7 @@ const ru: LANG_MESSAGE = {
   updateConfigs: 'Обновить конфигурации',
   updateConfigsSuccess: 'Конфигурации успешно обновлены',
   configFilePath: 'Путь к файлу конфигурации',
-  configFilePathPlaceholder: 'Абсолютный путь, например /etc/mihomo/config.yaml',
+  configFilePathPlaceholder: 'Абсолютный путь, например /etc/sing-box/config.json',
   configPayload: 'Содержимое конфигурации',
   configPayloadPlaceholder: 'Вставьте YAML содержимое конфигурации здесь...',
   forceUpdate: 'Принудительное обновление',

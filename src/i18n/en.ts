@@ -79,7 +79,7 @@ const en = {
   updateConfigs: 'Update configs',
   updateConfigsSuccess: 'Configs updated successfully',
   configFilePath: 'Config file path',
-  configFilePathPlaceholder: 'Absolute path, e.g. /etc/mihomo/config.yaml',
+  configFilePathPlaceholder: 'Absolute path, e.g. /etc/sing-box/config.json',
   configPayload: 'Config content',
   configPayloadPlaceholder: 'Paste YAML config content here...',
   forceUpdate: 'Force update',

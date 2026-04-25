@@ -101,7 +101,6 @@ import { useNotification } from '@/composables/notification'
 import { isDarkTheme } from '@/helper/utils'
 import { Profile } from '@main/shared/type'
 import * as monaco from 'monaco-editor'
-// @ts-expect-error - Monaco Editor worker import with query parameter
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
 import { nextTick, onUnmounted, ref, watch } from 'vue'
 import {

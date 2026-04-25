@@ -72,6 +72,7 @@
         </template>
       </div>
     </RouterView>
+    <AppOverviewFab v-if="!isMiddleScreen && isSidebarCollapsed" />
 
     <DialogWrapper v-model="autoSwitchBackendDialog">
       <div class="mb-2">
@@ -98,6 +99,7 @@
 <script setup lang="ts">
 import { isBackendAvailable } from '@/api'
 import DialogWrapper from '@/components/common/DialogWrapper.vue'
+import AppOverviewFab from '@/components/sidebar/AppOverviewFab.vue'
 import SideBar from '@/components/sidebar/SideBar.vue'
 import { dockTop } from '@/composables/paddingViews'
 import { useSwipeRouter } from '@/composables/swipe'
