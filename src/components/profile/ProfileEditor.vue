@@ -165,7 +165,7 @@ const parseJsonTopLevelNodes = (jsonContent: string) => {
   }
 }
 
-const loadJsonSchema = async (): Promise<any> => {
+const loadJsonSchema = async (): Promise<unknown> => {
   try {
     const result = await fetchJsonSchemaAPI()
 

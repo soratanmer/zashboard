@@ -97,7 +97,7 @@ export const clearRuntimeDirAPI = async (): Promise<void> => {
 }
 
 export const updateTrayStoreAPI = async (key: string, value: unknown): Promise<void> => {
-  return await api.invoke(TRAY_STORE_UPDATED, { key, value: JSON.stringify(value) })
+  return await api.invoke(TRAY_STORE_UPDATED, { key, value })
 }
 
 // 内核更新相关API
@@ -113,6 +113,12 @@ export const selectCoreFileAPI = async (): Promise<string | null> => {
   return await api.invoke(SELECT_CORE_FILE)
 }
 
-export const fetchJsonSchemaAPI = async (): Promise<any> => {
+type JsonSchemaAPIResult = {
+  success: boolean
+  data?: unknown
+  error?: string
+}
+
+export const fetchJsonSchemaAPI = async (): Promise<JsonSchemaAPIResult> => {
   return await api.invoke(FETCH_JSON_SCHEMA)
 }
