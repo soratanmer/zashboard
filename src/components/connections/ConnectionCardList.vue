@@ -1,14 +1,11 @@
 <template>
-  <template v-if="!renderConnections.length">
-    <div class="card m-2 flex-row p-2 text-sm">
-      {{ $t('noContent') }}
-    </div>
-  </template>
   <VirtualScroller
-    v-else
     :data="renderConnections"
     :size="size"
   >
+    <template v-slot:before>
+      <ConnectionCtrl />
+    </template>
     <template v-slot="{ item }: { item: Connection }">
       <ConnectionCard :conn="item" />
     </template>
@@ -21,8 +18,8 @@ import { connectionCardLines } from '@/store/settings'
 import type { Connection } from '@/types'
 import { computed } from 'vue'
 import VirtualScroller from '../common/VirtualScroller.vue'
+import ConnectionCtrl from '../controls/ConnectionCtrl.tsx'
 import ConnectionCard from './ConnectionCard'
-
 const size = computed(() => {
   return connectionCardLines.value.length * 28 + 4
 })

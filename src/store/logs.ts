@@ -13,6 +13,8 @@ export const logFilter = ref('')
 export const logTypeFilter = ref('')
 export const isPaused = ref(false)
 export const logLevel = useStorage<string>('config/log-level', LOG_LEVEL.Info)
+export const logFilterRegex = useStorage<string>('config/log-filter-regex', '')
+export const logFilterEnabled = useStorage<boolean>('config/log-filter-enabled', false)
 
 let cancel: () => void
 let logsTemp: LogWithSeq[] = []
@@ -28,9 +30,14 @@ const restructMatchs = () => {
   for (const { key, label, scope } of sourceIPLabelList.value) {
     if (scope && !scope.includes(activeBackend.value?.uuid as string)) continue
     if (key.startsWith('/')) continue
-    const regex = new RegExp(key + ':', 'ig')
 
-    ipSourceMatchs.push([regex, `${key} (${label}) :`])
+    if (key.includes(':')) {
+      const regex = new RegExp(`${key}]:`, 'ig')
+      ipSourceMatchs.push([regex, `${key}] (${label}) :`])
+    } else {
+      const regex = new RegExp(`${key}:`, 'ig')
+      ipSourceMatchs.push([regex, `${key} (${label}) :`])
+    }
   }
 }
 

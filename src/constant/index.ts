@@ -75,6 +75,12 @@ export enum PROXY_PREVIEW_TYPE {
   BAR = 'bar',
 }
 
+export enum CONNECTION_DISPLAY_STYLE {
+  AUTO = 'auto',
+  CARD = 'card',
+  TABLE = 'table',
+}
+
 export enum RULE_TAB_TYPE {
   RULES = 'rules',
   PROVIDER = 'ruleProvider',
@@ -176,12 +182,6 @@ export enum PROXY_TYPE {
   LoadBalance = 'loadbalance',
 }
 
-export enum PROXY_COUNT_MODE {
-  FILTERED_TOTAL = 'filteredTotal',
-  TOTAL = 'total',
-  ALIVE_TOTAL = 'aliveTotal',
-}
-
 export const SIMPLE_CARD_STYLE = [
   [CONNECTIONS_TABLE_ACCESSOR_KEY.Host, CONNECTIONS_TABLE_ACCESSOR_KEY.ConnectTime],
   [
@@ -208,41 +208,21 @@ export const DETAILED_CARD_STYLE = [
 export const ALL_THEME = [
   'light',
   'dark',
-  'light-legacy',
-  'dark-legacy',
-  'cupcake',
-  'bumblebee',
-  'emerald',
-  'corporate',
-  'synthwave',
-  'retro',
-  'cyberpunk',
-  'valentine',
+  ...(window.ksu ? ['light-monet', 'dark-monet'] : []),
   'halloween',
-  'garden',
   'forest',
-  'aqua',
   'lofi',
-  'pastel',
-  'fantasy',
   'wireframe',
   'black',
-  'luxury',
   'dracula',
-  'cmyk',
-  'autumn',
   'business',
-  'acid',
-  'lemonade',
   'night',
-  'coffee',
-  'winter',
   'dim',
   'nord',
   'sunset',
-  'caramellatte',
   'abyss',
-  'silk',
+  'cupcake',
+  'dark-daisyui5',
 ]
 
 export const DEFAULT_THEME = {
@@ -287,4 +267,44 @@ export enum IP_INFO_API {
   IPSB = 'ip.sb',
   IPWHOIS = 'ipwho.is',
   IPAPI = 'ipapi.is',
+}
+
+export enum SETTINGS_MENU_KEY {
+  general = 'generalSettings',
+  backend = 'backendSettings',
+  proxies = 'proxySettings',
+  connections = 'connectionSettings',
+  overview = 'overviewSettings',
+}
+
+export enum OVERVIEW_CARD {
+  ChartsCard = 'ChartsCard',
+  NetworkCard = 'NetworkCard',
+  ProviderTrafficOverview = 'ProviderTrafficOverview',
+  TopologyCharts = 'TopologyCharts',
+  ConnectionHistory = 'ConnectionHistory',
+  RuleHitCountCard = 'RuleHitCountCard',
+}
+
+export enum MIHOMO {
+  Meta = 'meta',
+  Alpha = 'alpha',
+  Smart = 'smart',
+}
+
+export const MIHOMO_CHANNEL: Record<MIHOMO, { url: string; check_update_url: string }> = {
+  [MIHOMO.Meta]: {
+    url: 'https://github.com/metacubex/mihomo',
+    check_update_url: 'https://api.github.com/repos/MetaCubeX/mihomo/releases/latest',
+  },
+  [MIHOMO.Alpha]: {
+    url: 'https://github.com/metacubex/mihomo',
+    check_update_url:
+      'https://api.github.com/repos/MetaCubeX/mihomo/releases/tags/Prerelease-Alpha',
+  },
+  [MIHOMO.Smart]: {
+    url: 'https://github.com/vernesong/mihomo',
+    check_update_url:
+      'https://api.github.com/repos/vernesong/mihomo/releases/tags/Prerelease-Alpha',
+  },
 }

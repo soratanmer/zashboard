@@ -34,6 +34,9 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'favicon-dark.svg'],
+      workbox: {
+        maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
+      },
       manifest: {
         name: 'zashboard',
         short_name: 'zashboard',
@@ -70,7 +73,8 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@renderer': fileURLToPath(new URL('./src', import.meta.url)),
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@main': fileURLToPath(new URL('../', import.meta.url)),
     },
   },
 })

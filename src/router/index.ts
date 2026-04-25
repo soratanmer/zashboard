@@ -12,6 +12,7 @@ import ProfilePage from '@/views/ProfilePage.vue'
 import ProxiesPage from '@/views/ProxiesPage.vue'
 import RulesPage from '@/views/RulesPage.vue'
 import SettingsPage from '@/views/SettingsPage.vue'
+import SetupPage from '@/views/SetupPage.vue'
 import { useTitle } from '@vueuse/core'
 import { watch } from 'vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
@@ -55,13 +56,18 @@ const childrenRouter = [
 ]
 
 const router = createRouter({
-  history: createWebHashHistory('/'),
+  history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
       redirect: ROUTE_NAME.proxies,
       component: HomePage,
       children: childrenRouter,
+    },
+    {
+      path: '/setup',
+      name: ROUTE_NAME.setup,
+      component: SetupPage,
     },
     {
       path: '/:catchAll(.*)',
@@ -93,7 +99,7 @@ router.beforeEach((to, from) => {
 
   if (
     !isCoreRunning.value &&
-    ![ROUTE_NAME.profiles, ROUTE_NAME.settings].includes(to.name as ROUTE_NAME)
+    ![ROUTE_NAME.profiles, ROUTE_NAME.settings, ROUTE_NAME.setup].includes(to.name as ROUTE_NAME)
   ) {
     router.push({ name: ROUTE_NAME.profiles })
   }
@@ -104,7 +110,9 @@ router.afterEach((to) => {
 })
 
 watch(language, () => {
-  setTitleByName(router.currentRoute.value.name)
+  setTimeout(() => {
+    setTitleByName(router.currentRoute.value.name)
+  })
 })
 
 export default router

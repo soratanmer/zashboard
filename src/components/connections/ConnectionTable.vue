@@ -1,7 +1,7 @@
 <template>
   <div
     ref="parentRef"
-    class="h-full overflow-auto p-2"
+    class="base-container m-3 h-full overflow-auto backdrop-blur-none!"
     :class="{
       'select-none': isDragging,
     }"
@@ -15,18 +15,16 @@
   >
     <div :style="{ height: `${totalSize}px` }">
       <table
-        :class="[
-          'table-zebra table rounded-none shadow-md',
-          sizeOfTable,
-          isManualTable && 'table-fixed',
-        ]"
+        :class="['table', sizeOfTable, isManualTable && 'table-fixed']"
         :style="
           isManualTable && {
             width: `${tanstackTable.getCenterTotalSize()}px`,
           }
         "
       >
-        <thead class="bg-base-100 sticky -top-2 z-10">
+        <thead
+          class="bg-base-100 border-base-300/60 sticky top-0 z-10 border-b backdrop-blur-none!"
+        >
           <tr
             v-for="headerGroup in tanstackTable.getHeaderGroups()"
             :key="headerGroup.id"
@@ -37,16 +35,17 @@
               :colSpan="header.colSpan"
               class="relative"
               :class="[
-                header.column.getCanSort() ? 'cursor-pointer select-none' : '',
-                header.column.getIsPinned && header.column.getIsPinned() === 'left'
-                  ? 'pinned-td bg-base-100 sticky -left-2 z-20'
-                  : '',
+                inheritedStyle,
+                header.column.getCanSort() && 'cursor-pointer select-none',
+                header.column.getIsPinned &&
+                  header.column.getIsPinned() === 'left' &&
+                  'pinned-td sticky left-0 z-20',
               ]"
-              :style="
+              :style="[
                 isManualTable && {
                   width: `${header.getSize()}px`,
-                }
-              "
+                },
+              ]"
               @click="header.column.getToggleSortingHandler()?.($event)"
             >
               <div class="flex items-center gap-1">
@@ -109,6 +108,19 @@
           </tr>
         </thead>
         <tbody>
+          <tr v-if="rows.length === 0">
+            <td
+              :colspan="tanstackTable.getVisibleLeafColumns().length"
+              class="text-base-content/50 h-90"
+            >
+              <div class="flex h-full flex-col items-center justify-center gap-3 px-6 text-center">
+                <CircleStackIcon class="h-10 w-10 opacity-60" />
+                <div class="space-y-1">
+                  <div class="text-base font-medium">{{ t('noData') }}</div>
+                </div>
+              </div>
+            </td>
+          </tr>
           <tr
             v-for="(virtualRow, index) in virtualRows"
             :key="virtualRow.key.toString()"
@@ -116,11 +128,11 @@
               height: `${virtualRow.size}px`,
               transform: `translateY(${virtualRow.start - index * virtualRow.size}px)`,
             }"
-            class="bg-base-100 hover:bg-primary! hover:text-primary-content"
-            :class="{
-              'cursor-pointer': !isDragging,
-              'cursor-grabbing': isDragging,
-            }"
+            class="hover:bg-primary! hover:text-primary-content!"
+            :class="[
+              virtualRow.index % 2 === 0 ? 'bg-base-150' : 'bg-base-100',
+              !isDragging ? 'cursor-pointer' : 'cursor-grabbing',
+            ]"
             @click="handlerClickRow(rows[virtualRow.index])"
           >
             <td
@@ -145,13 +157,13 @@
                       ].includes(cell.column.id as CONNECTIONS_TABLE_ACCESSOR_KEY) &&
                         'max-w-xl truncate',
                     ),
-                cell.column.getIsPinned && cell.column.getIsPinned() === 'left'
-                  ? 'pinned-td sticky -left-2 z-20 bg-inherit shadow-md'
-                  : '',
+                cell.column.getIsPinned &&
+                  cell.column.getIsPinned() === 'left' &&
+                  `pinned-td sticky left-0 z-20 ${inheritedStyle}`,
               ]"
               @contextmenu="handleCellRightClick($event, cell)"
             >
-              <template v-if="cell.column.getIsGrouped()">
+              <template v-if="cell.getIsGrouped()">
                 <template v-if="rows[virtualRow.index].getCanExpand()">
                   <div class="flex items-center overflow-hidden">
                     <component
@@ -174,7 +186,7 @@
                 </template>
               </template>
               <FlexRender
-                v-else
+                v-else-if="!cell.getIsPlaceholder()"
                 :render="
                   cell.getIsAggregated()
                     ? cell.column.columnDef.aggregatedCell
@@ -208,6 +220,7 @@ import {
   getNetworkTypeFromConnection,
   getProcessFromConnection,
 } from '@/helper'
+import { backgroundImage } from '@/helper/indexeddb'
 import { showNotification } from '@/helper/notification'
 import { getIPLabelFromMap } from '@/helper/sourceip'
 import { fromNow, prettyBytesHelper } from '@/helper/utils'
@@ -215,6 +228,7 @@ import { connectionTabShow, renderConnections } from '@/store/connections'
 import {
   connectionTableColumns,
   proxyChainDirection,
+  showFullProxyChain,
   tableSize,
   tableWidthMode,
 } from '@/store/settings'
@@ -223,6 +237,7 @@ import {
   ArrowDownCircleIcon,
   ArrowRightCircleIcon,
   ArrowUpCircleIcon,
+  CircleStackIcon,
   MagnifyingGlassMinusIcon,
   MagnifyingGlassPlusIcon,
   MapPinIcon,
@@ -252,9 +267,7 @@ import { twMerge } from 'tailwind-merge'
 import { computed, h, ref, type VNode } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ProxyName from '../proxies/ProxyName.vue'
-
 const { handlerInfo } = useConnections()
-
 const columnWidthMap = useStorage('config/table-column-width', {
   [CONNECTIONS_TABLE_ACCESSOR_KEY.Close]: 50,
   [CONNECTIONS_TABLE_ACCESSOR_KEY.Host]: 320,
@@ -363,8 +376,14 @@ const columns: ColumnDef<Connection>[] = [
     },
     cell: ({ row }) => {
       const chains: VNode[] = []
-      const originChains = row.original.chains
+      const isReverse = proxyChainDirection.value === PROXY_CHAIN_DIRECTION.REVERSE
+      let originChains = row.original.chains
 
+      if (!showFullProxyChain.value && originChains.length > 2) {
+        originChains = [originChains[0], originChains[originChains.length - 1]]
+      }
+
+      // 完整显示所有代理链
       originChains.forEach((chain, index) => {
         chains.unshift(h(ProxyName, { name: chain, key: chain }))
 
@@ -381,7 +400,7 @@ const columns: ColumnDef<Connection>[] = [
       return h(
         'div',
         {
-          class: `flex items-center ${proxyChainDirection.value === PROXY_CHAIN_DIRECTION.REVERSE && 'flex-row-reverse justify-end'} gap-1`,
+          class: `flex items-center ${isReverse && 'flex-row-reverse justify-end'} gap-1`,
         },
         chains,
       )
@@ -469,8 +488,8 @@ const columns: ColumnDef<Connection>[] = [
   },
 ]
 
-const grouping = ref<GroupingState>([])
-const expanded = ref<ExpandedState>({})
+const grouping = useStorage<GroupingState>('config/table-grouping', [])
+const expanded = useStorage<ExpandedState>('config/table-expanded', {})
 const sorting = useStorage<SortingState>('config/table-sorting', [])
 const columnPinning = useStorage<ColumnPinningState>('config/table-column-pinning', {
   left: [],
@@ -588,6 +607,16 @@ const sizeOfTable = computed(() => {
   return classMap[tableSize.value]
 })
 
+const inheritedStyle = computed(() => {
+  const baseStyle = 'bg-inherit'
+
+  if (!backgroundImage.value) {
+    return baseStyle
+  }
+
+  return `${baseStyle} backdrop-blur-sm`
+})
+
 const handlerClickRow = (row: Row<Connection>) => {
   if (isDragging.value) return
 
@@ -699,7 +728,7 @@ const handleCellRightClick = (
 }
 </script>
 
-<style>
+<style scoped>
 th .resizer {
   @apply opacity-0;
 }

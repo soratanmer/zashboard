@@ -5,8 +5,8 @@
       class="h-full w-full"
     />
     <span
-      ref="colorRef"
       class="border-b-primary/30 border-t-primary/60 border-l-info/30 border-r-info/60 text-base-content/10 bg-base-100/70 hidden"
+      ref="colorRef"
     />
     <button
       class="btn btn-ghost btn-xs absolute right-1 bottom-0"
@@ -21,6 +21,7 @@
 </template>
 
 <script setup lang="ts">
+import { isMiddleScreen } from '@/helper/utils'
 import { font, theme } from '@/store/settings'
 import { PauseCircleIcon, PlayCircleIcon } from '@heroicons/vue/24/outline'
 import { useElementSize } from '@vueuse/core'
@@ -28,8 +29,8 @@ import { LineChart } from 'echarts/charts'
 import { GridComponent, LegendComponent, TooltipComponent } from 'echarts/components'
 import * as echarts from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
-import { debounce } from 'lodash-es'
-import { computed, onMounted, ref, watch } from 'vue'
+import { debounce } from 'lodash'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
 echarts.use([LineChart, GridComponent, LegendComponent, TooltipComponent, CanvasRenderer])
 
@@ -80,10 +81,11 @@ const options = computed(() => {
       textStyle: {
         color: colorSet.baseContent,
         fontFamily,
+        fontSize: 10,
       },
     },
     grid: {
-      left: 60,
+      left: 50,
       top: 15,
       right: 8,
       bottom: 25,
@@ -93,11 +95,13 @@ const options = computed(() => {
       trigger: 'axis',
       backgroundColor: colorSet.base70,
       borderColor: colorSet.base70,
+      borderRadius: 8,
       confine: true,
-      padding: [0, 5],
+      padding: [0, 3],
       textStyle: {
         color: colorSet.baseContent,
         fontFamily,
+        fontSize: 11,
       },
       formatter: props.toolTipFormatter,
     },
@@ -124,10 +128,11 @@ const options = computed(() => {
       },
       axisLabel: {
         align: 'left',
-        padding: [0, 0, 0, -45],
+        padding: [0, 0, 0, -35],
         formatter: props.labelFormatter,
         color: colorSet.baseContent,
         fontFamily,
+        fontSize: 10,
       },
     },
     series: props.data.map((item, index) => {
@@ -164,6 +169,9 @@ const options = computed(() => {
   }
 })
 
+let myChart: echarts.ECharts | null = null
+let touchEndHandler: ((e: TouchEvent) => void) | null = null
+
 onMounted(() => {
   updateColorSet()
   updateFontFamily()
@@ -171,7 +179,7 @@ onMounted(() => {
   watch(theme, updateColorSet)
   watch(font, updateFontFamily)
 
-  const myChart = echarts.init(chart.value)
+  myChart = echarts.init(chart.value)
 
   myChart.setOption(options.value)
 
@@ -184,9 +192,29 @@ onMounted(() => {
 
   const { width } = useElementSize(chart)
   const resize = debounce(() => {
-    myChart.resize()
+    myChart?.resize()
   }, 100)
 
   watch(width, resize)
+
+  // 移动端：松手后自动隐藏 tooltip
+  if (isMiddleScreen.value && chart.value) {
+    touchEndHandler = () => {
+      if (myChart) {
+        myChart.dispatchAction({ type: 'hideTip' })
+      }
+    }
+    chart.value.addEventListener('touchend', touchEndHandler)
+  }
+})
+
+onUnmounted(() => {
+  if (chart.value && touchEndHandler) {
+    chart.value.removeEventListener('touchend', touchEndHandler)
+  }
+  if (myChart) {
+    myChart.dispose()
+    myChart = null
+  }
 })
 </script>

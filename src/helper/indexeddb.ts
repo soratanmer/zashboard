@@ -51,6 +51,7 @@ const useIndexedDB = (dbKey: string) => {
   }
 
   const put = async (key: string, value: string) => {
+    await dbPromise
     cacheMap.set(key, value)
     return executeTransaction('readwrite', (store) =>
       store.put({
@@ -66,6 +67,7 @@ const useIndexedDB = (dbKey: string) => {
   }
 
   const clear = async () => {
+    await dbPromise
     cacheMap.clear()
     return executeTransaction('readwrite', (store) => store.clear())
   }
@@ -76,6 +78,7 @@ const useIndexedDB = (dbKey: string) => {
   }
 
   const del = async (key: string) => {
+    await dbPromise
     cacheMap.delete(key)
     return executeTransaction('readwrite', (store) => store.delete(key))
   }
@@ -131,3 +134,47 @@ export const backgroundImage = computed(() => {
   }
   return `background-image: url('${customBackgroundURL.value}?v=${date}');`
 })
+
+export interface ConnectionHistoryData {
+  key: string
+  download: number
+  upload: number
+  count: number
+}
+
+export enum ConnectionHistoryType {
+  SourceIP = 'sourceIP',
+  Destination = 'destination',
+  Process = 'process',
+  Outbound = 'outbound',
+}
+
+const connectionHistoryDB = useIndexedDB('connection-history')
+
+export const saveConnectionHistoryToIndexedDB = async (
+  uuid: string,
+  aggregationType: ConnectionHistoryType,
+  data: ConnectionHistoryData[],
+) => {
+  const jsonData = JSON.stringify(data)
+  return connectionHistoryDB.put(`${uuid}-${aggregationType}`, jsonData)
+}
+
+export const getConnectionHistoryFromIndexedDB = async (
+  uuid: string,
+  aggregationType: ConnectionHistoryType,
+): Promise<ConnectionHistoryData[]> => {
+  const jsonData = await connectionHistoryDB.get(`${uuid}-${aggregationType}`)
+  if (!jsonData) {
+    return []
+  }
+  try {
+    return JSON.parse(jsonData) as ConnectionHistoryData[]
+  } catch {
+    return []
+  }
+}
+
+export const clearConnectionHistoryFromIndexedDB = async () => {
+  return connectionHistoryDB.clear()
+}

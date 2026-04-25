@@ -54,9 +54,14 @@ export const useTooltip = () => {
     tippyInstance?.hide()
   }
 
+  const updateTip = (content: string | HTMLElement) => {
+    tippyInstance?.setContent(content)
+  }
+
   return {
     showTip,
     hideTip,
+    updateTip,
   }
 }
 

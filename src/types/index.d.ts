@@ -7,6 +7,7 @@ export type Backend = {
   uuid: string
   label?: string
   disableUpgradeCore?: boolean
+  disableTunMode?: boolean
 }
 
 export type Config = {
@@ -51,6 +52,8 @@ export type Proxy = {
   icon: string
   hidden?: boolean
   testUrl?: string
+  'dialer-proxy'?: string
+  'provider-name'?: string
 }
 
 export type SubscriptionInfo = {
@@ -74,8 +77,18 @@ export type Rule = {
   payload: string
   proxy: string
   size: number
-  disabled: boolean
   uuid: string
+  // sing-box-reFind
+  disabled?: boolean
+  // mihomo
+  index: number
+  extra?: {
+    disabled: false
+    hitAt: string
+    hitCount: number
+    missAt: string
+    missCount: number
+  }
 }
 
 export type RuleProvider = {

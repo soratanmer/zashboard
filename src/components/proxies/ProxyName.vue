@@ -7,6 +7,7 @@
       :size="iconSize"
     />
     {{ name }}
+    <template v-if="dialerProxy"> ({{ dialerProxy }}) </template>
   </div>
 </template>
 
@@ -27,7 +28,11 @@ const props = withDefaults(
   },
 )
 
+const node = computed(() => proxyMap.value[props.name])
 const icon = computed(() => {
-  return proxyMap.value[props.name]?.icon
+  return node.value?.icon
+})
+const dialerProxy = computed(() => {
+  return node.value?.['dialer-proxy']
 })
 </script>

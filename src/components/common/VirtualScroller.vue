@@ -1,16 +1,18 @@
 <template>
   <div
     ref="parentRef"
-    class="flex h-full w-full overflow-y-auto p-2"
+    class="flex h-full w-full flex-col overflow-y-auto"
   >
+    <slot name="before" />
     <div
       :style="{
         height: `${totalSize}px`,
       }"
-      class="relative w-full"
+      class="relative w-full shrink-0"
+      v-if="data.length > 0"
     >
       <div
-        class="absolute top-0 left-0 w-full"
+        :class="['base-container virtual-scroller absolute top-3 right-3 left-3', contentClass]"
         :style="{
           transform: `translateY(${virtualRows[0]?.start ?? 0}px)`,
         }"
@@ -20,7 +22,7 @@
           :key="row.key.toString()"
           :data-index="row.index"
           :ref="(ref) => measureElement(ref as Element | null)"
-          class="mb-1"
+          :class="getBorderClass(row.index)"
         >
           <slot
             :item="data[row.index]"
@@ -29,13 +31,25 @@
         </div>
       </div>
     </div>
+    <div
+      v-else
+      class="base-container m-3 flex-row p-3 text-sm"
+      :style="{ marginTop: `${paddingTop + 12}px`, marginBottom: `${paddingBottom}px` }"
+    >
+      {{ $t('noData') }}
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { usePaddingForViews } from '@/composables/paddingViews'
 import { useVirtualizer } from '@tanstack/vue-virtual'
 import { computed, nextTick, ref } from 'vue'
 
+const { paddingTop, paddingBottom } = usePaddingForViews({
+  offsetTop: 0,
+  offsetBottom: 0,
+})
 const parentRef = ref<HTMLElement | null>(null)
 const props = withDefaults(
   defineProps<{
@@ -43,26 +57,36 @@ const props = withDefaults(
     data: any[]
     size?: number
     overscan?: number
+    contentClass?: string
   }>(),
   {
     data: () => [],
     size: 64,
     overscan: 24,
+    contentClass: '',
   },
 )
+
 const virutalOptions = computed(() => {
   return {
     count: props.data.length,
     getScrollElement: () => parentRef.value,
     estimateSize: () => props.size,
     overscan: props.overscan,
+    paddingStart: paddingTop.value,
+    paddingEnd: paddingBottom.value + 24,
   }
 })
 
 const rowVirtualizer = useVirtualizer(virutalOptions)
-
 const virtualRows = computed(() => rowVirtualizer.value.getVirtualItems())
 const totalSize = computed(() => rowVirtualizer.value.getTotalSize())
+const getBorderClass = (index: number) => {
+  if (index !== 0) {
+    return 'border-base-border border-t'
+  }
+  return ''
+}
 
 const measureElement = (el: Element | null) => {
   if (!el) {

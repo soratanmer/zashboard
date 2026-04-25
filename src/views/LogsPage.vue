@@ -1,16 +1,13 @@
 <template>
-  <div class="size-full overflow-x-hidden">
-    <template v-if="!renderLogs.length">
-      <div class="card m-2 flex-row p-2 text-sm">
-        {{ $t('noContent') }}
-      </div>
-    </template>
+  <div class="relative size-full overflow-x-hidden">
     <VirtualScroller
-      v-else
       :data="renderLogs"
-      :size="isMiddleScreen ? 96 : 64"
+      :size="44"
     >
-      <template #default="{ item }: { item: LogWithSeq }">
+      <template v-slot:before>
+        <LogsCtrl />
+      </template>
+      <template v-slot="{ item }: { item: LogWithSeq }">
         <LogsCard :log="item" />
       </template>
     </VirtualScroller>
@@ -19,9 +16,9 @@
 
 <script setup lang="ts">
 import VirtualScroller from '@/components/common/VirtualScroller.vue'
+import LogsCtrl from '@/components/controls/LogsCtrl.tsx'
 import LogsCard from '@/components/logs/LogsCard.vue'
-import { isMiddleScreen } from '@/helper/utils'
-import { logFilter, logTypeFilter, logs } from '@/store/logs'
+import { logFilter, logFilterEnabled, logFilterRegex, logTypeFilter, logs } from '@/store/logs'
 import type { LogWithSeq } from '@/types'
 import { computed } from 'vue'
 
@@ -44,6 +41,13 @@ const renderLogs = computed(() => {
       }
 
       return true
+    })
+  }
+
+  if (logFilterEnabled.value && logFilterRegex.value) {
+    const hideRegex = new RegExp(logFilterRegex.value, 'i')
+    renderLogs = renderLogs.filter((log) => {
+      return ![log.payload, log.time, log.type].some((i) => hideRegex.test(i))
     })
   }
 

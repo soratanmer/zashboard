@@ -1,20 +1,26 @@
 <template>
   <div
+    class="max-md:scrollbar-hidden h-full"
+    :class="[
+      disableProxiesPageScroll ? 'overflow-y-hidden' : 'overflow-y-scroll',
+      disableProxiesPageTextSelect ? 'select-none' : '',
+    ]"
+    :style="padding"
+    :id="PROXIES_PAGE"
     ref="proxiesRef"
-    class="max-md:scrollbar-hidden h-full p-2 md:pr-1"
-    :class="disableProxiesPageScroll ? 'overflow-y-hidden' : 'overflow-y-scroll'"
     @scroll.passive="handleScroll"
   >
+    <ProxiesCtrl />
     <template v-if="displayTwoColumns">
-      <div class="grid grid-cols-2 gap-1">
+      <div class="grid grid-cols-2 gap-3 p-3 md:pr-1">
         <div
           v-for="idx in [0, 1]"
           :key="idx"
-          class="flex flex-1 flex-col gap-1"
+          class="flex flex-1 flex-col gap-3"
         >
           <component
-            :is="renderComponent"
             v-for="name in filterContent(renderGroups, idx)"
+            :is="renderComponent"
             :key="name"
             :name="name"
           />
@@ -22,12 +28,12 @@
       </div>
     </template>
     <div
+      class="grid grid-cols-1 gap-3 p-3 md:pr-1"
       v-else
-      class="grid grid-cols-1 gap-1"
     >
       <component
-        :is="renderComponent"
         v-for="name in renderGroups"
+        :is="renderComponent"
         :key="name"
         :name="name"
       />
@@ -36,17 +42,23 @@
 </template>
 
 <script setup lang="ts">
+import ProxiesCtrl from '@/components/controls/ProxiesCtrl'
 import ProxyGroup from '@/components/proxies/ProxyGroup.vue'
 import ProxyGroupForMobile from '@/components/proxies/ProxyGroupForMobile.vue'
 import ProxyProvider from '@/components/proxies/ProxyProvider.vue'
+import { usePaddingForViews } from '@/composables/paddingViews'
 import { disableProxiesPageScroll, isProxiesPageMounted, renderGroups } from '@/composables/proxies'
 import { PROXY_TAB_TYPE } from '@/constant'
-import { isMiddleScreen } from '@/helper/utils'
+import { isMiddleScreen, PROXIES_PAGE } from '@/helper/utils'
 import { fetchProxies, proxiesTabShow } from '@/store/proxies'
-import { twoColumnProxyGroup } from '@/store/settings'
+import { disableProxiesPageTextSelect, twoColumnProxyGroup } from '@/store/settings'
 import { useSessionStorage } from '@vueuse/core'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 
+const { padding } = usePaddingForViews({
+  offsetTop: 0,
+  offsetBottom: 0,
+})
 const proxiesRef = ref()
 const scrollStatus = useSessionStorage('cache/proxies-scroll-status', {
   [PROXY_TAB_TYPE.PROVIDER]: 0,
@@ -54,15 +66,20 @@ const scrollStatus = useSessionStorage('cache/proxies-scroll-status', {
 })
 
 const handleScroll = () => {
+  if (!proxiesRef.value) return
   scrollStatus.value[proxiesTabShow.value] = proxiesRef.value.scrollTop
 }
 
 const waitTickUntilReady = (startTime = performance.now()) => {
+  const proxiesEl = proxiesRef.value
+  const isTimedOut = performance.now() - startTime > 300
+
   if (
-    performance.now() - startTime > 300 ||
-    proxiesRef.value.scrollHeight > scrollStatus.value[proxiesTabShow.value]
+    isTimedOut ||
+    (proxiesEl && proxiesEl.scrollHeight > scrollStatus.value[proxiesTabShow.value])
   ) {
-    proxiesRef.value.scrollTo({
+    if (!proxiesEl) return
+    proxiesEl.scrollTo({
       top: scrollStatus.value[proxiesTabShow.value],
       behavior: 'smooth',
     })

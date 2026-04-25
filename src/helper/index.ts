@@ -44,9 +44,14 @@ export const isProxyGroup = (name: string) => {
 }
 
 export const getHostFromConnection = (connection: Connection) => {
-  return `${connection.metadata.host || connection.metadata.sniffHost || connection.metadata.destinationIP}:${
-    connection.metadata.destinationPort
-  }`
+  const port = connection.metadata.destinationPort
+  const host =
+    connection.metadata.host || connection.metadata.sniffHost || connection.metadata.destinationIP
+
+  if (host.includes(':')) {
+    return `[${host}]:${port}`
+  }
+  return `${host}:${port}`
 }
 
 export const getProcessFromConnection = (connection: Connection) => {
@@ -164,6 +169,15 @@ export const applyCustomThemes = () => {
     style.className = `custom-theme ${theme.name}`
     document.head.appendChild(style)
   })
+}
+
+export const applyKsuTheme = () => {
+  if (window.ksu) {
+    const link = document.createElement('link')
+    link.rel = 'stylesheet'
+    link.href = 'https://mui.kernelsu.org/internal/colors.css'
+    document.head.appendChild(link)
+  }
 }
 
 export const isHiddenGroup = (group: string) => {

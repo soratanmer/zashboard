@@ -5,7 +5,8 @@ import type { Connection, ConnectionRawMessage } from '@/types'
 import { useStorage, watchOnce } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { computed, ref, watch } from 'vue'
-import { autoDisconnectIdleUDP, autoDisconnectIdleUDPTime, useConnectionCard } from './settings'
+import { initAggregatedDataMap, saveConnectionHistory } from './connHistory'
+import { autoDisconnectIdleUDP, autoDisconnectIdleUDPTime, isConnectionCard } from './settings'
 
 export const connectionTabShow = ref(CONNECTION_TAB_TYPE.ACTIVE)
 export const connectionSortType = useStorage<SORT_TYPE>(
@@ -39,10 +40,10 @@ export const resetConnections = () => {
   downloadTotal.value = 0
   uploadTotal.value = 0
   previousConnectionsMap.clear()
+  initAggregatedDataMap()
 }
 export const initConnections = () => {
   resetConnections()
-
   const ws = fetchConnectionsAPI<{
     connections: ConnectionRawMessage[]
     downloadTotal: number
@@ -86,9 +87,13 @@ export const initConnections = () => {
         return connection
       }) ?? []
 
-    closedConnections.value = closedConnections.value
-      .concat(Array.from(previousConnectionsMap.values()))
-      .slice(-500)
+    const newlyClosedConnections = Array.from(previousConnectionsMap.values())
+    closedConnections.value = closedConnections.value.concat(newlyClosedConnections).slice(-500)
+
+    if (newlyClosedConnections.length > 0) {
+      saveConnectionHistory(newlyClosedConnections)
+    }
+
     previousConnectionsMap = currentConnectionsMap
   })
 
@@ -181,6 +186,10 @@ export const renderConnections = computed(() => {
         conn.metadata.sourceIP,
         conn.metadata.sourcePort,
         conn.metadata.sniffHost,
+        conn.metadata.inboundUser,
+        conn.metadata.inboundName,
+        conn.metadata.inboundPort,
+        conn.metadata.process,
         conn.metadata.processPath,
         conn.metadata.type,
         conn.metadata.network,
@@ -211,10 +220,10 @@ export const renderConnections = computed(() => {
       return true
     })
     .sort((a, b) => {
-      if (useConnectionCard.value && isDesc.value) {
+      if (isConnectionCard.value && isDesc.value) {
         ;[a, b] = [b, a]
       }
-      const sortResult = useConnectionCard.value
+      const sortResult = isConnectionCard.value
         ? sortFunctionMap[connectionSortType.value](a, b)
         : sortFunctionMap[SORT_TYPE.HOST](a, b)
 

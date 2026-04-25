@@ -7,6 +7,7 @@ import zh from './zh'
 import zhTW from './zh-tw'
 
 export const i18n = createI18n({
+  legacy: false,
   locale: language.value,
   messages: {
     [LANG.EN_US]: en,

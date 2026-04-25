@@ -1,68 +1,82 @@
 <template>
-  <div class="bg-base-200/50 home-page flex size-full">
-    <SideBar v-if="!isMiddleScreen" />
+  <div
+    class="bg-base-200 home-page flex size-full"
+    :class="sidebarLayoutCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'"
+  >
+    <div
+      v-if="!isMiddleScreen"
+      class="relative z-40 flex-none overflow-visible transition-none"
+      :class="sidebarLayoutCollapsed ? 'w-18' : 'w-64'"
+    >
+      <SideBar
+        class="absolute inset-y-0 left-0"
+        @transitionend="syncSidebarLayoutState"
+      />
+    </div>
     <RouterView v-slot="{ Component, route }">
       <div
         ref="swiperRef"
-        class="flex flex-1 flex-col overflow-hidden"
+        class="relative flex flex-1 flex-col overflow-hidden"
       >
-        <div
-          v-if="ctrlsMap[route.name as string]"
-          class="bg-base-100 ctrls-bar w-full"
-          ref="ctrlsBarRef"
-        >
-          <component
-            :is="ctrlsMap[route.name as string]"
-            :is-large-ctrls-bar="isLargeCtrlsBar"
+        <div class="absolute flex h-full w-full flex-col overflow-y-auto">
+          <Transition
+            :name="(route.meta.transition as string) || 'fade'"
+            v-if="isMiddleScreen"
+          >
+            <Component :is="Component" />
+          </Transition>
+          <Component
+            v-else
+            :is="Component"
           />
-        </div>
-
-        <div class="relative h-0 flex-1">
-          <div class="absolute flex h-full w-full flex-col overflow-y-auto">
-            <Transition
-              v-if="isMiddleScreen"
-              :name="(route.meta.transition as string) || 'fade'"
-            >
-              <Component :is="Component" />
-            </Transition>
-            <Component
-              :is="Component"
-              v-else
-            />
-          </div>
         </div>
         <template v-if="isMiddleScreen">
           <div
-            class="nav-bar shrink-0"
-            :style="styleForSafeArea"
-          />
-          <div
-            class="dock dock-sm bg-base-200 z-30"
-            :style="styleForSafeArea"
+            class="bg-base-100/20 dock dock-xs z-10 h-14 w-auto shadow-sm backdrop-blur-sm"
+            :style="{
+              padding: '0',
+              bottom: 'calc(var(--spacing) * 2 + env(safe-area-inset-bottom))',
+            }"
+            ref="dockRef"
           >
             <button
               v-for="r in renderRoutes"
               :key="r"
+              @click="router.push({ name: r, replace: true })"
+              class="h-14 flex-col items-center justify-center pt-2"
               :class="r === route.name && 'dock-active'"
-              @click="router.push({ name: r })"
             >
               <component
                 :is="ROUTE_ICON_MAP[r]"
-                class="size-5"
+                class="h-5 w-5 flex-shrink-0"
               />
               <span class="dock-label">
                 {{ $t(r) }}
               </span>
             </button>
           </div>
+          <div
+            class="fixed bottom-0 z-10 w-full"
+            style="
+              background: linear-gradient(
+                to top,
+                rgba(0, 0, 0, 0.3),
+                rgba(0, 0, 0, 0.16),
+                rgba(0, 0, 0, 0.08),
+                rgba(0, 0, 0, 0.02),
+                rgba(0, 0, 0, 0)
+              );
+              height: env(safe-area-inset-bottom);
+            "
+          ></div>
         </template>
       </div>
     </RouterView>
 
     <DialogWrapper v-model="autoSwitchBackendDialog">
-      <h3 class="text-lg font-bold">
+      <div class="mb-2">
         {{ $t('currentBackendUnavailable') }}
-      </h3>
+      </div>
       <div class="flex justify-end gap-2">
         <button
           class="btn btn-sm"
@@ -84,13 +98,11 @@
 <script setup lang="ts">
 import { isBackendAvailable } from '@/api'
 import DialogWrapper from '@/components/common/DialogWrapper.vue'
-import ConnectionCtrl from '@/components/sidebar/ConnectionCtrl.tsx'
-import LogsCtrl from '@/components/sidebar/LogsCtrl.tsx'
-import ProxiesCtrl from '@/components/sidebar/ProxiesCtrl.tsx'
-import RulesCtrl from '@/components/sidebar/RulesCtrl.tsx'
 import SideBar from '@/components/sidebar/SideBar.vue'
+import { dockTop } from '@/composables/paddingViews'
+import { useSettings } from '@/composables/settings'
 import { useSwipeRouter } from '@/composables/swipe'
-import { PROXY_TAB_TYPE, ROUTE_ICON_MAP, ROUTE_NAME, RULE_TAB_TYPE } from '@/constant'
+import { PROXY_TAB_TYPE, ROUTE_ICON_MAP, RULE_TAB_TYPE } from '@/constant'
 import { renderRoutes } from '@/helper'
 import { showNotification } from '@/helper/notification'
 import { getLabelFromBackend, isMiddleScreen } from '@/helper/utils'
@@ -100,48 +112,62 @@ import { initLogs } from '@/store/logs'
 import { initSatistic } from '@/store/overview'
 import { fetchProxies, proxiesTabShow } from '@/store/proxies'
 import { fetchRules, rulesTabShow } from '@/store/rules'
+import { isSidebarCollapsed } from '@/store/settings'
 import { activeBackend, activeUuid, backendList } from '@/store/setup'
 import type { Backend } from '@/types'
-import { useDocumentVisibility, useElementSize } from '@vueuse/core'
-import { computed, ref, watch, type Component } from 'vue'
+import { useDocumentVisibility, useElementBounding } from '@vueuse/core'
+import { ref, watch } from 'vue'
 import { RouterView, useRouter } from 'vue-router'
 import { resetConnections } from '../store/connections'
 import { resetLogs } from '../store/logs'
 import { resetStatistic } from '../store/overview'
-import { useConnectionCard } from '../store/settings'
 import { isCoreRunning } from '../store/status'
-
-const ctrlsMap: Record<string, Component> = {
-  [ROUTE_NAME.connections]: ConnectionCtrl,
-  [ROUTE_NAME.logs]: LogsCtrl,
-  [ROUTE_NAME.proxies]: ProxiesCtrl,
-  [ROUTE_NAME.rules]: RulesCtrl,
-}
-
-const styleForSafeArea = {
-  height: 'calc(var(--spacing) * 14 + env(safe-area-inset-bottom))',
-  'padding-bottom': 'env(safe-area-inset-bottom)',
-}
 
 const router = useRouter()
 const { swiperRef } = useSwipeRouter()
+const sidebarLayoutCollapsed = ref(isSidebarCollapsed.value)
 
-const ctrlsBarRef = ref<HTMLDivElement>()
-const { width: ctrlsBarWidth } = useElementSize(ctrlsBarRef)
-const isLargeCtrlsBar = computed(() => {
-  if (router.currentRoute.value.name === ROUTE_NAME.connections && useConnectionCard.value) {
-    return ctrlsBarWidth.value > 860
+const dockRef = ref<HTMLDivElement>()
+const { top: dockRefTop } = useElementBounding(dockRef)
+
+const syncSidebarLayoutState = () => {
+  sidebarLayoutCollapsed.value = isSidebarCollapsed.value
+}
+
+watch(isSidebarCollapsed, (value) => {
+  if (value) {
+    sidebarLayoutCollapsed.value = true
   }
-  return ctrlsBarWidth.value > 720
 })
 
 watch(
-  isCoreRunning,
+  isMiddleScreen,
+  (value) => {
+    if (!value) {
+      sidebarLayoutCollapsed.value = isSidebarCollapsed.value
+    }
+  },
+  { immediate: true },
+)
+
+watch(
+  dockRefTop,
+  () => {
+    dockTop.value = window.innerHeight - dockRefTop.value
+  },
+  { immediate: true },
+)
+
+watch(
+  [activeUuid, isCoreRunning],
   () => {
     if (!isCoreRunning.value) {
       resetStatistic()
       resetConnections()
       resetLogs()
+      return
+    }
+    if (!activeUuid.value) {
       return
     }
     rulesTabShow.value = RULE_TAB_TYPE.RULES
@@ -186,6 +212,7 @@ const autoSwitchBackend = async () => {
       params: {
         backend: getLabelFromBackend(avaliable),
       },
+      type: 'alert-success',
     })
   }
 }

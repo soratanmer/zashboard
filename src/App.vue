@@ -3,7 +3,12 @@ import { computed, onMounted, ref, type Ref, watch } from 'vue'
 import { RouterView } from 'vue-router'
 import { useKeyboard } from './composables/keyboard'
 import { EMOJIS, FONTS } from './constant'
-import { autoImportSettings, importSettingsFromUrl } from './helper/autoImportSettings'
+import {
+  autoImportSettings,
+  autoSyncSettings,
+  importSettingsFromUrl,
+  syncSettingsFromCore,
+} from './helper/autoImportSettings'
 import { backgroundImage } from './helper/indexeddb'
 import { initNotification } from './helper/notification'
 import { getBackendFromUrl, isDarkTheme, isPreferredDark } from './helper/utils'
@@ -60,12 +65,13 @@ watch(isPreferredDark, setThemeColor)
 watch(
   disablePullToRefresh,
   () => {
+    const body = document.body
     if (disablePullToRefresh.value) {
-      document.body.style.overscrollBehavior = 'none'
-      document.documentElement.style.overscrollBehavior = 'none'
+      body.style.overscrollBehavior = 'none'
+      body.style.overflow = 'hidden'
     } else {
-      document.body.style.overscrollBehavior = ''
-      document.documentElement.style.overscrollBehavior = ''
+      body.style.overscrollBehavior = ''
+      body.style.overflow = ''
     }
   },
   {
@@ -79,7 +85,9 @@ const isSameBackend = (b1: Omit<Backend, 'uuid'>, b2: Omit<Backend, 'uuid'>) => 
     b1.port === b2.port &&
     b1.password === b2.password &&
     b1.protocol === b2.protocol &&
-    b1.secondaryPath === b2.secondaryPath
+    b1.secondaryPath === b2.secondaryPath &&
+    b1.disableUpgradeCore === b2.disableUpgradeCore &&
+    b1.disableTunMode === b2.disableTunMode
   )
 }
 
@@ -98,10 +106,19 @@ const autoSwitchToURLBackendIfExists = () => {
 
 autoSwitchToURLBackendIfExists()
 
-onMounted(() => {
+onMounted(async () => {
   if (autoImportSettings.value) {
-    importSettingsFromUrl()
+    await importSettingsFromUrl()
   }
+
+  if (autoSyncSettings.value) {
+    try {
+      await syncSettingsFromCore()
+    } catch (e) {
+      console.error('Failed to auto-sync settings on app load:', e)
+    }
+  }
+
   watch(
     theme,
     () => {
@@ -132,7 +149,7 @@ useKeyboard()
     id="app-content"
     ref="app"
     :class="[
-      'bg-base-100 flex h-dvh w-screen overflow-x-hidden',
+      'bg-base-100 flex h-dvh w-screen overflow-hidden',
       fontClassName,
       backgroundImage &&
         `custom-background-${dashboardTransparent} custom-background bg-cover bg-center`,
@@ -143,7 +160,7 @@ useKeyboard()
     <RouterView />
     <div
       ref="toast"
-      class="toast-sm toast toast-end toast-top z-9999 max-w-80 text-sm md:max-w-96 md:translate-y-8"
+      class="toast-sm toast toast-end toast-top z-[100000] max-w-80 text-sm md:max-w-96 md:translate-y-8"
     />
   </div>
 </template>

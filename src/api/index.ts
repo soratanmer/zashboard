@@ -1,3 +1,4 @@
+import { MIHOMO } from '@/constant'
 import { showNotification } from '@/helper/notification'
 import { getUrlFromBackend } from '@/helper/utils'
 import { activeBackend, activeUuid } from '@/store/setup'
@@ -45,7 +46,7 @@ axios.interceptors.response.use(
 
       showNotification({
         key: errorMessage,
-        content: `${error.config?.url} \n${errorMessage}`,
+        content: `${decodeURIComponent(error.config?.url || '')} \n${errorMessage}`,
         type: 'alert-error',
       })
       return Promise.reject(error)
@@ -63,6 +64,23 @@ addMessageListener(CORE_VERSION, (value: string) => {
 })
 
 export const isSingBox = computed(() => true)
+export const mihomo = computed<[MIHOMO, string] | undefined>(() => {
+  if (!version.value || isSingBox.value) {
+    return undefined
+  }
+
+  const match = /(alpha-smart|alpha|beta|meta)-?(\w+)/.exec(version.value)
+  switch (match?.[1]) {
+    case 'alpha':
+      return [MIHOMO.Alpha, match[2] ?? version.value]
+    case 'alpha-smart':
+      return [MIHOMO.Smart, match[2] ?? version.value]
+    case 'meta':
+      return [MIHOMO.Meta, match[2] ?? version.value]
+    default:
+      return [MIHOMO.Meta, version.value]
+  }
+})
 export const zashboardVersion = ref(__APP_VERSION__)
 
 export const fetchProxiesAPI = () => {
@@ -135,7 +153,11 @@ export const fetchRulesAPI = () => {
   return axios.get<{ rules: Rule[] }>('/rules')
 }
 
-export const toggleRuleDisabledAPI = (uuid: string) => {
+export const toggleRuleDisabledAPI = (data: Record<number, boolean>) => {
+  return axios.patch(`/rules/disable`, data)
+}
+
+export const toggleRuleDisabledSingBoxAPI = (uuid: string) => {
   return axios.put(`/rules/${encodeURIComponent(uuid)}`)
 }
 
@@ -179,6 +201,16 @@ export const reloadConfigsAPI = () => {
   return axios.put('/configs?reload=true', { path: '', payload: '' })
 }
 
+export const updateConfigsAPI = (
+  config: { path?: string; payload?: string },
+  force: boolean = false,
+) => {
+  return axios.put(`/configs${force ? '?force=true' : ''}`, {
+    path: config.path || '',
+    payload: config.payload || '',
+  })
+}
+
 export const upgradeUIAPI = () => {
   return axios.post('/upgrade/ui')
 }
@@ -201,6 +233,18 @@ export const queryDNSAPI = (params: { name: string; type: string }) => {
   return axios.get<DNSQuery>('/dns/query', {
     params,
   })
+}
+
+export const getStorageAPI = () => {
+  return axios.get<Record<string, unknown>>(`/storage/zashboard`)
+}
+
+export const setStorageAPI = (value: Record<string, string>) => {
+  return axios.put(`/storage/zashboard`, value)
+}
+
+export const deleteStorageAPI = () => {
+  return axios.delete(`/storage/zashboard`)
 }
 
 const createWebSocket = <T>(url: string, searchParams?: Record<string, string>) => {
@@ -331,35 +375,8 @@ const check = async (url: string, versionNumber: string) => {
 }
 
 export const fetchBackendUpdateAvailableAPI = async () => {
-  const match = /(alpha-smart|alpha|beta|meta)-?(\w+)/.exec(version.value)
-
-  if (!match) {
-    const { tag_name } = await fetchWithLocalCache<{ tag_name: string }>(
-      'https://api.github.com/repos/MetaCubeX/mihomo/releases/latest',
-      version.value,
-    )
-
-    return Boolean(tag_name && !tag_name.endsWith(version.value))
-  }
-
-  const channel = match[1],
-    versionNumber = match[2]
-
-  if (channel === 'meta')
-    return await check(
-      'https://api.github.com/repos/MetaCubeX/mihomo/releases/latest',
-      versionNumber,
-    )
-  if (channel === 'alpha')
-    return await check(
-      'https://api.github.com/repos/MetaCubeX/mihomo/releases/tags/Prerelease-Alpha',
-      versionNumber,
-    )
-  if (channel === 'alpha-smart')
-    return await check(
-      'https://api.github.com/repos/vernesong/mihomo/releases/tags/Prerelease-Alpha',
-      versionNumber,
-    )
-
-  return false
+  return await check(
+    MIHOMO_CHANNEL[mihomo.value?.[0] ?? MIHOMO.Meta].check_update_url,
+    mihomo.value?.[1] ?? version.value,
+  )
 }

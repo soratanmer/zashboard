@@ -3,39 +3,36 @@
     ref="cardRef"
     :class="
       twMerge(
-        'bg-base-200 flex cursor-pointer flex-col items-start rounded-md',
-        active ? 'bg-primary sm:hover:bg-primary/95' : 'sm:hover:bg-base-300',
+        'bg-base-200 flex cursor-pointer flex-col items-start rounded-md hover:shadow-sm',
+        active ? 'bg-primary sm:hover:bg-primary/95' : 'sm:hover:bg-base-300/50',
         isSmallCard ? 'gap-1 p-1' : 'gap-2 p-2',
         latencyTipAnimationClass,
       )
     "
     @contextmenu.stop.prevent="handlerLatencyTest"
   >
-    <div class="flex w-full flex-1 items-center">
+    <div
+      class="w-full flex-1 text-sm"
+      :class="truncateProxyName && 'truncate'"
+      @mouseenter="checkTruncation"
+    >
       <ProxyIcon
         v-if="node?.icon"
-        class="shrink-0"
+        class="-mt-[2px] shrink-0 align-middle"
         :icon="node.icon"
         :fill="active ? 'fill-primary-content' : 'fill-base-content'"
-      />
-      <!-- fix twemoji on ios -->
-      <span
+      /><span
         v-if="active"
-        :class="twMerge('text-primary-content text-sm', truncateProxyName && 'truncate')"
-        @mouseenter="checkTruncation"
-      >
-        {{ node.name }}
-      </span>
-      <span
+        class="text-primary-content"
+        >{{ node.name }}</span
+      ><span
         v-else
-        :class="twMerge('text-base-content text-sm', truncateProxyName && 'truncate')"
-        @mouseenter="checkTruncation"
+        class="text-base-content"
+        >{{ node.name }}</span
       >
-        {{ node.name }}
-      </span>
     </div>
 
-    <div class="flex h-4 w-full items-center justify-between select-none">
+    <div class="flex h-4 w-full items-center justify-between">
       <span
         :class="`truncate text-xs tracking-tight ${active ? 'text-primary-content' : 'text-base-content/60'}`"
         @mouseenter="checkTruncation"
@@ -43,7 +40,7 @@
         {{ typeDescription }}
       </span>
       <LatencyTag
-        :class="[isSmallCard && 'h-4! w-8! rounded-md!', 'shrink-0', active && 'hover:bg-base-300']"
+        :class="[isSmallCard && 'h-4! w-8! rounded-md!', 'shrink-0']"
         :name="node.name"
         :loading="isLatencyTesting"
         :group-name="groupName"
@@ -57,15 +54,16 @@
 import { PROXY_CARD_SIZE, PROXY_SORT_TYPE } from '@/constant'
 import { checkTruncation } from '@/helper/tooltip'
 import { scrollIntoCenter } from '@/helper/utils'
-import { i18n } from '@/i18n'
 import { getIPv6ByName, getTestUrl, proxyLatencyTest, proxyMap } from '@/store/proxies'
 import { IPv6test, proxyCardSize, proxySortType, truncateProxyName } from '@/store/settings'
 import { smartWeightsMap } from '@/store/smart'
 import { twMerge } from 'tailwind-merge'
 import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import LatencyTag from './LatencyTag.vue'
 import ProxyIcon from './ProxyIcon.vue'
 
+const { t } = useI18n()
 const props = defineProps<{
   name: string
   active?: boolean
@@ -87,7 +85,7 @@ const isSmallCard = computed(() => proxyCardSize.value === PROXY_CARD_SIZE.SMALL
 const typeDescription = computed(() => {
   const type = typeFormatter(node.value.type)
   const smartUsage = smartWeightsMap.value[props.groupName ?? '']?.[props.name]
-  const smartDesc = smartUsage ? i18n.global.t(smartUsage) : ''
+  const smartDesc = smartUsage ? t(smartUsage) : ''
   const isV6 = IPv6test.value && getIPv6ByName(node.value.name) ? 'IPv6' : ''
   const isUDP = node.value.udp ? (node.value.xudp ? 'xudp' : 'udp') : ''
 

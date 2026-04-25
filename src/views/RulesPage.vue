@@ -1,33 +1,44 @@
 <template>
-  <div
-    class="flex flex-col gap-1 overflow-x-hidden"
-    :class="renderRules.length < 200 && 'p-2'"
-  >
-    <template v-if="rulesTabShow === RULE_TAB_TYPE.PROVIDER">
-      <RuleProvider
-        v-for="(ruleProvider, index) in renderRulesProvider"
-        :key="ruleProvider.name"
-        :rule-provider="ruleProvider"
-        :index="index + 1"
-      />
-    </template>
-    <template v-else-if="renderRules.length < 200">
-      <RuleCard
-        v-for="rule in renderRules"
-        :key="rule.payload"
-        :rule="rule"
-        :index="rules.indexOf(rule) + 1"
-      />
+  <div class="relative size-full overflow-x-hidden">
+    <template v-if="!isVirtualScroller">
+      <RulesCtrl />
+      <div
+        class="p-3"
+        :style="padding"
+      >
+        <template v-if="rulesTabShow === RULE_TAB_TYPE.PROVIDER">
+          <div class="base-container">
+            <RuleProvider
+              v-for="(ruleProvider, index) in renderRulesProvider"
+              :key="ruleProvider.name"
+              :ruleProvider="ruleProvider"
+              :index="index + 1"
+            />
+          </div>
+        </template>
+        <template v-else>
+          <div class="base-container">
+            <RuleCard
+              v-for="rule in renderRules"
+              :key="rule.payload"
+              :rule="rule"
+              :index="rules.indexOf(rule) + 1"
+            />
+          </div>
+        </template>
+      </div>
     </template>
     <VirtualScroller
       v-else
       :data="renderRules"
-      :size="64"
+      :size="44"
     >
-      <template #default="{ item: rule }: { item: Rule }">
+      <template v-slot:before>
+        <RulesCtrl />
+      </template>
+      <template v-slot="{ item: rule }: { item: Rule }">
         <RuleCard
           :key="rule.payload"
-          class="mb-1"
           :rule="rule"
           :index="rules.indexOf(rule) + 1"
         />
@@ -38,11 +49,25 @@
 
 <script setup lang="ts">
 import VirtualScroller from '@/components/common/VirtualScroller.vue'
+import RulesCtrl from '@/components/controls/RulesCtrl'
 import RuleCard from '@/components/rules/RuleCard.vue'
 import RuleProvider from '@/components/rules/RuleProvider.vue'
+import { usePaddingForViews } from '@/composables/paddingViews'
 import { RULE_TAB_TYPE } from '@/constant'
 import { fetchRules, renderRules, renderRulesProvider, rules, rulesTabShow } from '@/store/rules'
 import type { Rule } from '@/types'
+import { computed, provide, ref } from 'vue'
 
 fetchRules()
+
+const expandedRule = ref<string | null>(null)
+provide('expandedRule', expandedRule)
+
+const { padding } = usePaddingForViews({
+  offsetTop: 12,
+  offsetBottom: 8,
+})
+const isVirtualScroller = computed(() => {
+  return rulesTabShow.value === RULE_TAB_TYPE.RULES && renderRules.value.length > 200
+})
 </script>
