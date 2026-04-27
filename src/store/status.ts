@@ -29,6 +29,8 @@ export const resetCoreLogs = () => {
   coreLogs.value = []
 }
 
+const stripAnsi = (value: string) => value.replace(/\x1B\[[0-?]*[ -/]*[@-~]/g, '')
+
 const applyCoreSnapshot = async ({ isRunning }: CoreSnapshot) => {
   backendList.value = []
   if (isRunning) {
@@ -68,5 +70,5 @@ addMessageListener<string>(CORE_START_LOG, (log) => {
   if (!showCoreStartupModal.value) {
     showCoreStartupModal.value = true
   }
-  coreLogs.value.unshift(log)
+  coreLogs.value.unshift(stripAnsi(log).trim())
 })

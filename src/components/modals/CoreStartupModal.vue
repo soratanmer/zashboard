@@ -22,7 +22,7 @@
         </div>
       </div>
 
-      <div class="flex-1 overflow-y-auto p-2">
+      <div class="flex-1 overflow-y-auto p-4">
         <div
           v-if="coreLogs.length === 0"
           class="text-base-content/50 py-8 text-center"
@@ -31,12 +31,12 @@
         </div>
         <div
           v-else
-          class="space-y-1"
+          class="flex flex-col"
         >
           <div
             v-for="(log, index) in coreLogs"
             :key="index"
-            class="font-mono text-sm break-all whitespace-pre-wrap"
+            class="text-sm break-all border-base-300/30 not-last:border-b p-2"
             :class="getLogClass(log)"
           >
             {{ log }}
@@ -94,15 +94,15 @@ const getLogClass = (log: string) => {
     lowerLog.includes(LOG_LEVEL.Fatal) ||
     lowerLog.includes(LOG_LEVEL.Panic)
   ) {
-    return 'text-error font-bold'
+    return 'text-error '
   }
   if (lowerLog.includes(LOG_LEVEL.Warning)) {
     return 'text-warning'
   }
   if (lowerLog.includes('clash-api: restful api listening at')) {
-    return 'text-success font-bold'
+    return 'text-success '
   }
-  return 'text-base-content'
+  return 'text-base-content/80'
 }
 
 const hasFatalOrPanicLogs = computed(() => {

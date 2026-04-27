@@ -5,7 +5,7 @@
     :class="isSidebarCollapsed ? 'w-18 px-0' : 'w-64'"
     @transitionend="handleTransitionEnd"
   >
-    <div :class="twMerge('flex h-full w-full flex-col gap-2')">
+    <div :class="twMerge('flex h-full flex-col gap-2', isSidebarCollapsed ? 'w-18 px-0' : 'w-64')">
       <ul class="menu w-full flex-1">
         <li
           v-for="r in renderRoutes"

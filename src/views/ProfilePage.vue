@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-full flex-col gap-1 overflow-x-hidden p-2">
+  <div class="flex h-full flex-col gap-1 overflow-x-hidden p-4">
     <div class="card h-full">
       <div class="card-title justify-between px-4 pt-4">
         {{ $t('profiles') }}
