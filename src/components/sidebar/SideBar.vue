@@ -5,7 +5,7 @@
     :class="isSidebarCollapsed ? 'w-18 px-0' : 'w-64'"
     @transitionend="handleTransitionEnd"
   >
-    <div :class="twMerge('flex h-full flex-col gap-2', isSidebarCollapsed ? 'w-18 px-0' : 'w-64')">
+    <div :class="twMerge('flex h-full flex-col gap-2', isSidebarCollapsed ? 'w-18 px-0' : 'w-60')">
       <ul class="menu w-full flex-1">
         <li
           v-for="r in renderRoutes"
@@ -31,7 +31,7 @@
         </li>
       </ul>
       <template v-if="isSidebarCollapsed">
-        <VerticalInfos v-if="showStatisticsWhenSidebarCollapsed">
+        <VerticalInfos v-if="showStatisticsWhenSidebarCollapsed && isCoreRunning">
           <SidebarButtons vertical />
         </VerticalInfos>
         <SidebarButtons
@@ -41,7 +41,7 @@
       </template>
       <template v-else>
         <AppOverview />
-        <OverviewCarousel />
+        <OverviewCarousel v-if="isCoreRunning" />
         <CommonSidebar class="base-container" />
       </template>
     </div>
@@ -55,6 +55,7 @@ import { renderRoutes } from '@/helper'
 import { useTooltip } from '@/helper/tooltip'
 import router from '@/router'
 import { isSidebarCollapsed, showStatisticsWhenSidebarCollapsed } from '@/store/settings'
+import { isCoreRunning } from '@/store/status'
 import { twMerge } from 'tailwind-merge'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'

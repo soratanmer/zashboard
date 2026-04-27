@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col gap-2 p-2 text-sm">
-    <SidebarStatistics />
+    <SidebarStatistics v-if="isCoreRunning" />
     <div class="flex gap-2">
       <SidebarButtons />
       <BackendVersion />
@@ -9,6 +9,7 @@
 </template>
 
 <script setup lang="ts">
+import { isCoreRunning } from '@/store/status'
 import BackendVersion from '../common/BackendVersion.vue'
 import SidebarButtons from './SidebarButtons.vue'
 import SidebarStatistics from './SidebarStatistics.vue'

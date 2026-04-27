@@ -1,5 +1,5 @@
 <template>
-  <div class="card gap-2 p-2 text-sm">
+  <div class="card gap-2 p-2 text-xs text-base-content/80">
     <div class="flex items-center gap-2">
       <div class="flex items-center gap-2">
         {{ $t('coreStatus') }}
