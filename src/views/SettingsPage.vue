@@ -41,7 +41,7 @@
           >
             <div
               class="mt-1 mb-3 px-1 text-lg font-semibold"
-              v-if="![SETTINGS_MENU_KEY.general, SETTINGS_MENU_KEY.backend].includes(item.key)"
+              v-if="item.key !== SETTINGS_MENU_KEY.general"
             >
               {{ $t(item.label) }}
             </div>
@@ -64,7 +64,7 @@
       >
         <div
           class="mt-1 mb-3 px-1 text-lg font-semibold"
-          v-if="![SETTINGS_MENU_KEY.general, SETTINGS_MENU_KEY.backend].includes(item.key)"
+          v-if="item.key !== SETTINGS_MENU_KEY.general"
         >
           {{ $t(item.label) }}
         </div>
@@ -76,7 +76,6 @@
 
 <script setup lang="ts">
 import SettingsMenu from '@/components/controls/SettingsCtrl.vue'
-import BackendSettings from '@/components/settings/backend/BackendSettings.vue'
 import ConnectionsSettings from '@/components/settings/connections/ConnectionsSettings.vue'
 import ZashboardSettings from '@/components/settings/general/ZashboardSettings.vue'
 import OverviewSettings from '@/components/settings/overview/OverviewSettings.vue'
@@ -92,7 +91,6 @@ import {
   CubeTransparentIcon,
   GlobeAltIcon,
   HomeIcon,
-  ServerIcon,
 } from '@heroicons/vue/24/outline'
 import { useElementSize } from '@vueuse/core'
 import { throttle } from 'lodash'
@@ -133,15 +131,6 @@ const menuItems = computed<MenuItem[]>(() => {
         label: 'overviewSettings',
         icon: CubeTransparentIcon,
         component: OverviewSettings,
-      },
-    ],
-    [
-      SETTINGS_MENU_KEY.backend,
-      {
-        key: SETTINGS_MENU_KEY.backend,
-        label: 'backendSettings',
-        icon: ServerIcon,
-        component: BackendSettings,
       },
     ],
     [

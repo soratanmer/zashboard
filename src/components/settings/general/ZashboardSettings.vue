@@ -13,6 +13,7 @@
       </a>
     </div>
 
+    <BackendSettings />
     <template v-if="isVisibleActions">
       <div class="settings-section-label">
         {{ $t('actions') }}
@@ -85,6 +86,7 @@ import { isAutoLaunchEnabled } from '@/store/status'
 import { ref } from 'vue'
 import DashboardSettings from '../../common/DashboardSettings.vue'
 import CoreUpdateModal from '../../modals/CoreUpdateModal.vue'
+import BackendSettings from '../backend/BackendSettings.vue'
 import GeneralSettings from './GeneralSettings.vue'
 import StyleSettings from './StyleSettings.vue'
 

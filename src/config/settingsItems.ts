@@ -16,7 +16,6 @@ export const SETTINGS_CATEGORIES: SettingsCategory[] = [
     key: SETTINGS_MENU_KEY.backend,
     label: 'backendSettings',
     items: [
-      { key: `${SETTINGS_MENU_KEY.backend}.backendSwitch`, label: 'backend' },
       { key: `${SETTINGS_MENU_KEY.backend}.actions`, label: 'actions' },
       { key: `${SETTINGS_MENU_KEY.backend}.dnsQuery`, label: 'DNSQuery' },
       { key: `${SETTINGS_MENU_KEY.backend}.ports`, label: 'ports' },
