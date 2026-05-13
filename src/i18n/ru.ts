@@ -59,6 +59,11 @@ const ru: LANG_MESSAGE = {
   settings: 'Настройки',
   speedtestUrl: 'URL теста скорости',
   speedtestTimeout: 'Таймаут теста скорости',
+  speedtestMode: 'Режим теста скорости',
+  speedtestModeDashboard: 'Управление панелью',
+  speedtestModeCore: 'Управление ядром',
+  speedtestModeTip:
+    'Управление панелью оставляет группы Selector, LoadBalance и Smart на тестировании отдельных узлов из панели и показывает прогресс по узлам. Управление ядром вызывает API группового теста ядра, чтобы ядро проверило всю группу сразу.',
   connectionStyle: 'Стиль подключения',
   card: 'Карточка',
   table: 'Таблица',

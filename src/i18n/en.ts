@@ -57,6 +57,11 @@ const en = {
   settings: 'Settings',
   speedtestUrl: 'Speedtest URL',
   speedtestTimeout: 'Speedtest timeout',
+  speedtestMode: 'Speedtest mode',
+  speedtestModeDashboard: 'Dashboard controlled',
+  speedtestModeCore: 'Core controlled',
+  speedtestModeTip:
+    'Dashboard controlled keeps Selector, LoadBalance, and Smart groups on the dashboard-driven per-node test flow and shows per-node progress. Core controlled calls the core group latency API and lets the core test the whole group at once.',
   connectionStyle: 'Connection style',
   card: 'Card',
   table: 'Table',
