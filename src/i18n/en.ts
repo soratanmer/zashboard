@@ -198,6 +198,8 @@ const en = {
   search: 'Search',
   searchProxyGroup: 'Search proxy groups',
   searchProxyNode: 'Search proxy nodes',
+  proxySearchModeGlobal: 'Node search',
+  proxySearchModeGroup: 'Policy group search',
   searchMultiple: 'Space-separated keywords',
   importing: 'Importing...',
   hideConnection: 'Hide connection',

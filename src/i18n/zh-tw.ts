@@ -198,6 +198,8 @@ const zhTW: LANG_MESSAGE = {
   search: '搜尋',
   searchProxyGroup: '搜尋代理組',
   searchProxyNode: '搜尋節點',
+  proxySearchModeGlobal: '節點搜尋',
+  proxySearchModeGroup: '策略組搜尋',
   searchMultiple: '多個關鍵詞用空格分隔',
   importing: '正在匯入',
   hideConnection: '隱藏連接',

@@ -74,6 +74,11 @@ export enum PROXY_PREVIEW_TYPE {
   BAR = 'bar',
 }
 
+export enum PROXY_SEARCH_MODE {
+  GLOBAL = 'global',
+  GROUP = 'group',
+}
+
 export enum SPEEDTEST_MODE {
   CORE = 'core',
   DASHBOARD = 'dashboard',
