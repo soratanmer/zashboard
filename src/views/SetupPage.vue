@@ -99,10 +99,10 @@
               <ChevronUpDownIcon class="h-4 w-4 cursor-grab" />
             </button>
             <button
-              class="btn btn-sm flex-1"
+              class="btn btn-sm min-w-0 flex-1"
               @click="selectBackend(element.uuid)"
             >
-              {{ getLabelFromBackend(element) }}
+              <span class="truncate">{{ getLabelFromBackend(element) }}</span>
             </button>
             <button
               class="btn btn-circle btn-ghost btn-sm"
