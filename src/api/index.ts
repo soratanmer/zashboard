@@ -25,7 +25,7 @@ axios.interceptors.request.use((config) => {
   return config
 })
 
-const ignoreNotificationUrls = ['/delay', '/weights']
+const ignoreNotificationUrls = ['/delay', '/weights', '/storage/zashboard']
 
 axios.interceptors.response.use(
   null,

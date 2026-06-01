@@ -1,6 +1,9 @@
 <template>
   <div
     class="bg-base-100 scrollbar-hidden border-base-300/50 sticky top-3 z-10 m-3 mb-0 flex items-center gap-1 overflow-x-auto rounded-xl p-1 shadow"
+    @touchstart="disableSwipe = true"
+    @touchend="disableSwipe = false"
+    @touchcancel="disableSwipe = false"
   >
     <FolderItem
       :id="VIRTUAL_ALL"
@@ -43,6 +46,7 @@
 </template>
 
 <script setup lang="ts">
+import { disableSwipe } from '@/composables/swipe'
 import { proxyGroupList } from '@/store/proxies'
 import {
   activeFolderId,
