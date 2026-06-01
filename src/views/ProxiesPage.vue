@@ -5,17 +5,16 @@
     :class="[disableProxiesPageTextSelect ? 'select-none' : '']"
   >
     <ProxiesCtrl />
-    <FolderTopBar v-if="foldersUiVisible && isMiddleScreen" />
     <div class="flex min-h-0 w-full flex-1">
-      <FolderRail v-if="foldersUiVisible && !isMiddleScreen" />
       <FolderManagerPanel v-if="foldersUiVisible && folderManagerOpen" />
       <div
-        class="max-md:scrollbar-hidden h-full min-w-0 flex-1"
+        class="max-md:scrollbar-hidden relative h-full min-w-0 flex-1"
         :class="disableProxiesPageScroll ? 'overflow-y-hidden' : 'overflow-y-scroll'"
         :id="PROXIES_PAGE"
         ref="proxiesRef"
         @scroll.passive="handleScroll"
       >
+        <FolderTopBar v-if="foldersUiVisible" />
         <template v-if="displayTwoColumns">
           <div class="grid grid-cols-2 gap-3 p-3 md:pr-1">
             <div
@@ -51,7 +50,6 @@
 <script setup lang="ts">
 import ProxiesCtrl from '@/components/controls/ProxiesCtrl'
 import FolderManagerPanel from '@/components/proxies/folders/FolderManagerPanel.vue'
-import FolderRail from '@/components/proxies/folders/FolderRail.vue'
 import FolderTopBar from '@/components/proxies/folders/FolderTopBar.vue'
 import ProxyGroup from '@/components/proxies/ProxyGroup.vue'
 import ProxyGroupForMobile from '@/components/proxies/ProxyGroupForMobile.vue'

@@ -2,7 +2,7 @@
   <!-- PC: inline slide-out aside -->
   <aside
     v-if="!isMiddleScreen"
-    class="border-base-300 flex h-full flex-col overflow-hidden border-r transition-all duration-200"
+    class="bg-base-100 m-3 mr-0 flex flex-col overflow-hidden rounded-xl"
     :class="folderManagerOpen ? 'w-80' : 'w-0'"
   >
     <FolderManagerContent v-if="folderManagerOpen" />
@@ -13,6 +13,7 @@
     v-else
     v-model="folderManagerOpen"
     :title="$t('folder_manage')"
+    no-padding
     box-class="!max-w-full"
   >
     <FolderManagerContent />

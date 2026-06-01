@@ -1,6 +1,6 @@
 <template>
   <button
-    class="group flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm transition-colors"
+    class="group flex items-center gap-2 rounded-lg p-2 py-1 text-sm transition-colors"
     :class="[
       orientation === 'horizontal' ? 'shrink-0' : 'w-full text-left',
       isActive ? 'bg-primary/15 text-primary' : 'hover:bg-base-200',
@@ -15,7 +15,8 @@
     <span class="truncate">{{ label }}</span>
     <span
       v-if="count !== undefined"
-      class="text-base-content/60 ml-auto shrink-0 text-xs tabular-nums"
+      class="ml-auto shrink-0 text-xs tabular-nums"
+      :class="[isActive ? 'text-primary' : 'text-base-content/60']"
     >
       {{ count }}
     </span>

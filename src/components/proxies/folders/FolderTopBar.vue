@@ -1,6 +1,6 @@
 <template>
   <div
-    class="border-base-300 scrollbar-hidden flex items-center gap-1 overflow-x-auto border-b px-2 py-1.5"
+    class="bg-base-100 scrollbar-hidden border-base-300/50 sticky top-3 z-10 m-3 mb-0 flex items-center gap-1 overflow-x-auto rounded-xl p-1 shadow"
   >
     <FolderItem
       :id="VIRTUAL_ALL"
@@ -23,6 +23,7 @@
       @activate="activeFolderId = f.id"
     />
     <FolderItem
+      v-if="folderCount(VIRTUAL_UNCAT) > 0"
       :id="VIRTUAL_UNCAT"
       :label="$t('folder_uncategorized')"
       :count="folderCount(VIRTUAL_UNCAT)"
@@ -33,7 +34,7 @@
     />
     <button
       class="btn btn-ghost btn-sm ml-auto shrink-0"
-      @click="folderManagerOpen = true"
+      @click="folderManagerOpen = !folderManagerOpen"
       :title="$t('folder_manage')"
     >
       <Cog6ToothIcon class="h-4 w-4" />

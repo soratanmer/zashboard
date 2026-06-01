@@ -1,6 +1,9 @@
 <template>
   <div class="flex h-full flex-col overflow-hidden">
-    <header class="border-base-300 flex items-center gap-2 border-b p-2.5">
+    <header
+      class="border-base-300/50 flex items-center gap-2 border-b p-2.5"
+      v-if="!isMiddleScreen"
+    >
       <FolderIcon class="h-4 w-4" />
       <h3 class="flex-1 text-sm font-medium">{{ $t('folder_manage') }}</h3>
       <button
@@ -44,7 +47,7 @@
           </template>
         </Draggable>
       </div>
-      <footer class="border-base-300 border-t p-2">
+      <footer class="border-base-300/50 border-t p-2">
         <div class="flex gap-1.5">
           <input
             v-model="newName"
