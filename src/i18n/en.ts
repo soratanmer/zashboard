@@ -361,6 +361,9 @@ const en = {
 
   // Proxy folders
   proxyFolderMode: 'Proxy folder mode',
+  folderModeAuto: 'Auto',
+  folderModeOn: 'On',
+  folderModeOff: 'Off',
   folder_all: 'All',
   folder_uncategorized: 'Uncategorized',
   folder_manage: 'Manage folders',

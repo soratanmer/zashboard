@@ -132,12 +132,12 @@ export const SETTINGS_CATEGORIES: SettingsCategory[] = [
       },
       { key: `${SETTINGS_MENU_KEY.proxies}.groupTestUrls`, label: 'groupTestUrls' },
       {
-        key: `${SETTINGS_MENU_KEY.proxies}.twoColumnProxyGroup`,
-        label: 'twoColumnProxyGroup',
-      },
-      {
         key: `${SETTINGS_MENU_KEY.proxies}.proxyFolderMode`,
         label: 'proxyFolderMode',
+      },
+      {
+        key: `${SETTINGS_MENU_KEY.proxies}.twoColumnProxyGroup`,
+        label: 'twoColumnProxyGroup',
       },
       { key: `${SETTINGS_MENU_KEY.proxies}.truncateProxyName`, label: 'truncateProxyName' },
       {

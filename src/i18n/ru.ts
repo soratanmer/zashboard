@@ -363,6 +363,9 @@ const ru: LANG_MESSAGE = {
 
   // Папки прокси
   proxyFolderMode: 'Режим папок',
+  folderModeAuto: 'Авто',
+  folderModeOn: 'Вкл',
+  folderModeOff: 'Выкл',
   folder_all: 'Все',
   folder_uncategorized: 'Без категории',
   folder_manage: 'Управление папками',

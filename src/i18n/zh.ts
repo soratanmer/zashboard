@@ -354,6 +354,9 @@ const zh: LANG_MESSAGE = {
 
   // 代理文件夹
   proxyFolderMode: '文件夹模式',
+  folderModeAuto: '自动',
+  folderModeOn: '开启',
+  folderModeOff: '关闭',
   folder_all: '全部',
   folder_uncategorized: '未分类',
   folder_manage: '管理文件夹',

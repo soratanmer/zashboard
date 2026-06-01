@@ -5,6 +5,7 @@ import {
   CONNECTION_DISPLAY_STYLE,
   DETAILED_CARD_STYLE,
   EMOJIS,
+  FOLDER_MODE,
   FONTS,
   GLOBAL,
   IP_INFO_API,
@@ -218,7 +219,11 @@ export const proxyGroupFilterMap = useStorage<Record<string, string>>(
 )
 export const displayFinalOutbound = useStorage('config/show-selected-for-now-node', false)
 export const twoColumnProxyGroup = useStorage('config/two-columns', true)
-export const proxyFolderMode = useStorage('config/proxy-folder-mode', false)
+export const proxyFolderMode = useStorage<FOLDER_MODE>(
+  'config/proxy-folder-mode-setting',
+  FOLDER_MODE.AUTO,
+)
+
 export const speedtestUrl = useStorage<string>('config/speedtest-url', TEST_URL)
 export const independentLatencyTest = useStorage('config/independent-latency-test', false)
 export const speedtestTimeout = useStorage<number>('config/speedtest-timeout', 5000)

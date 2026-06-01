@@ -1,4 +1,6 @@
+import { FOLDER_MODE, FOLDER_MODE_AUTO_THRESHOLD } from '@/constant'
 import { proxyGroupList, proxyMap } from '@/store/proxies'
+import { proxyFolderMode } from '@/store/settings'
 import { useStorage } from '@vueuse/core'
 import { v4 as uuid } from 'uuid'
 import { computed, watch } from 'vue'
@@ -157,6 +159,17 @@ export const groupsInActiveFolder = computed<Set<string> | null>(() => {
 })
 
 export const folderCount = (id: string) => groupsByFolder.value.get(id)?.length ?? 0
+
+export const isProxyFolderModeActive = computed(() => {
+  switch (proxyFolderMode.value) {
+    case FOLDER_MODE.ON:
+      return true
+    case FOLDER_MODE.OFF:
+      return false
+    default:
+      return proxyGroupList.value.length > FOLDER_MODE_AUTO_THRESHOLD
+  }
+})
 
 watch(
   proxyGroupList,

@@ -122,6 +122,28 @@
       </div>
       <div class="settings-grid">
         <div
+          v-if="isVisibleProxyFolderMode"
+          class="setting-item"
+        >
+          <div class="setting-item-label">
+            {{ $t('proxyFolderMode') }}
+          </div>
+          <select
+            class="select select-sm min-w-24"
+            v-model="proxyFolderMode"
+          >
+            <option :value="FOLDER_MODE.AUTO">
+              {{ $t('folderModeAuto') }}
+            </option>
+            <option :value="FOLDER_MODE.ON">
+              {{ $t('folderModeOn') }}
+            </option>
+            <option :value="FOLDER_MODE.OFF">
+              {{ $t('folderModeOff') }}
+            </option>
+          </select>
+        </div>
+        <div
           v-if="isVisibleTwoColumnProxyGroup"
           class="setting-item"
         >
@@ -132,19 +154,6 @@
             class="toggle"
             type="checkbox"
             v-model="twoColumnProxyGroup"
-          />
-        </div>
-        <div
-          v-if="isVisibleProxyFolderMode"
-          class="setting-item"
-        >
-          <div class="setting-item-label">
-            {{ $t('proxyFolderMode') }}
-          </div>
-          <input
-            class="toggle"
-            type="checkbox"
-            v-model="proxyFolderMode"
           />
         </div>
         <div
@@ -270,7 +279,7 @@
 import { isSingBox } from '@/api'
 import { useIsSettingVisible } from '@/composables/settings'
 import { PROXIES_ITEM_KEYS } from '@/config/settingsItems'
-import { PROXY_CARD_SIZE, PROXY_PREVIEW_TYPE, SPEEDTEST_MODE } from '@/constant'
+import { FOLDER_MODE, PROXY_CARD_SIZE, PROXY_PREVIEW_TYPE, SPEEDTEST_MODE } from '@/constant'
 import { useTooltip } from '@/helper/tooltip'
 import { getMinCardWidth } from '@/helper/utils'
 import { proxyMap } from '@/store/proxies'

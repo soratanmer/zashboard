@@ -63,12 +63,8 @@ import {
 import { PROXY_TAB_TYPE } from '@/constant'
 import { isMiddleScreen, PROXIES_PAGE } from '@/helper/utils'
 import { fetchProxies, proxiesTabShow } from '@/store/proxies'
-import {
-  disableProxiesPageTextSelect,
-  proxyFolderMode,
-  twoColumnProxyGroup,
-} from '@/store/settings'
-import { folderManagerOpen } from '@/store/proxyFolders'
+import { disableProxiesPageTextSelect, twoColumnProxyGroup } from '@/store/settings'
+import { folderManagerOpen, isProxyFolderModeActive } from '@/store/proxyFolders'
 import { useSessionStorage } from '@vueuse/core'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 
@@ -139,7 +135,7 @@ const renderComponent = computed(() => {
 })
 
 const foldersUiVisible = computed(
-  () => proxyFolderMode.value && proxiesTabShow.value === PROXY_TAB_TYPE.PROXIES,
+  () => isProxyFolderModeActive.value && proxiesTabShow.value === PROXY_TAB_TYPE.PROXIES,
 )
 
 const displayTwoColumns = computed(() => {

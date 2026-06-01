@@ -354,6 +354,9 @@ const zhTW: LANG_MESSAGE = {
 
   // 代理資料夾
   proxyFolderMode: '資料夾模式',
+  folderModeAuto: '自動',
+  folderModeOn: '開啟',
+  folderModeOff: '關閉',
   folder_all: '全部',
   folder_uncategorized: '未分類',
   folder_manage: '管理資料夾',
