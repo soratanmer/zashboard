@@ -351,6 +351,28 @@ const zh: LANG_MESSAGE = {
   RarelyUsed: '很少使用',
   OccasionalUsed: '偶尔使用',
   MostUsed: '经常使用',
+
+  // 代理文件夹
+  proxyFolderMode: '文件夹模式',
+  folder_all: '全部',
+  folder_uncategorized: '未分类',
+  folder_manage: '管理文件夹',
+  folder_builtin_strategy: '策略组',
+  folder_builtin_nodes: '节点组',
+  folder_name: '文件夹名称',
+  folder_new_placeholder: '新文件夹名称',
+  folder_rules: '自动规则',
+  folder_rule_auto: '自动',
+  folder_rule_regex: '正则',
+  folder_rule_exclude_regex: '排除正则',
+  folder_auto_hasGroup: '包含子组',
+  folder_auto_nodeOnly: '仅含节点',
+  folder_add_rule: '添加规则',
+  folder_manual_includes: '手动加入',
+  folder_filter_placeholder: '搜索代理组',
+  folder_preview: '自动匹配的代理组',
+  folder_no_matches: '没有匹配的代理组',
+  folder_delete_confirm: '确认删除文件夹「{name}」？',
 }
 
 export default zh

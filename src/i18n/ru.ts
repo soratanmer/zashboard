@@ -360,6 +360,28 @@ const ru: LANG_MESSAGE = {
   RarelyUsed: 'Редко используется',
   OccasionalUsed: 'Иногда используется',
   MostUsed: 'Часто используется',
+
+  // Папки прокси
+  proxyFolderMode: 'Режим папок',
+  folder_all: 'Все',
+  folder_uncategorized: 'Без категории',
+  folder_manage: 'Управление папками',
+  folder_builtin_strategy: 'Группы стратегий',
+  folder_builtin_nodes: 'Группы узлов',
+  folder_name: 'Имя папки',
+  folder_new_placeholder: 'Имя новой папки',
+  folder_rules: 'Авто-правила',
+  folder_rule_auto: 'Авто',
+  folder_rule_regex: 'Regex',
+  folder_rule_exclude_regex: 'Exclude regex',
+  folder_auto_hasGroup: 'Содержит под-группы',
+  folder_auto_nodeOnly: 'Только узлы',
+  folder_add_rule: 'Добавить правило',
+  folder_manual_includes: 'Включено вручную',
+  folder_filter_placeholder: 'Поиск групп',
+  folder_preview: 'Автоматически подобранные группы',
+  folder_no_matches: 'Нет подходящих групп',
+  folder_delete_confirm: 'Удалить папку «{name}»?',
 }
 
 export default ru

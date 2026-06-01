@@ -351,6 +351,28 @@ const zhTW: LANG_MESSAGE = {
   RarelyUsed: '很少使用',
   OccasionalUsed: '偶爾使用',
   MostUsed: '經常使用',
+
+  // 代理資料夾
+  proxyFolderMode: '資料夾模式',
+  folder_all: '全部',
+  folder_uncategorized: '未分類',
+  folder_manage: '管理資料夾',
+  folder_builtin_strategy: '策略組',
+  folder_builtin_nodes: '節點組',
+  folder_name: '資料夾名稱',
+  folder_new_placeholder: '新資料夾名稱',
+  folder_rules: '自動規則',
+  folder_rule_auto: '自動',
+  folder_rule_regex: '正則',
+  folder_rule_exclude_regex: '排除正則',
+  folder_auto_hasGroup: '包含子組',
+  folder_auto_nodeOnly: '僅含節點',
+  folder_add_rule: '新增規則',
+  folder_manual_includes: '手動加入',
+  folder_filter_placeholder: '搜尋代理組',
+  folder_preview: '自動匹配的代理組',
+  folder_no_matches: '沒有符合的代理組',
+  folder_delete_confirm: '確認刪除資料夾「{name}」？',
 }
 
 export default zhTW

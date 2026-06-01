@@ -1,48 +1,58 @@
 <template>
   <div
-    class="max-md:scrollbar-hidden h-full"
-    :class="[
-      disableProxiesPageScroll ? 'overflow-y-hidden' : 'overflow-y-scroll',
-      disableProxiesPageTextSelect ? 'select-none' : '',
-    ]"
+    class="flex h-full w-full flex-col"
     :style="padding"
-    :id="PROXIES_PAGE"
-    ref="proxiesRef"
-    @scroll.passive="handleScroll"
+    :class="[disableProxiesPageTextSelect ? 'select-none' : '']"
   >
     <ProxiesCtrl />
-    <template v-if="displayTwoColumns">
-      <div class="grid grid-cols-2 gap-3 p-3 md:pr-1">
+    <FolderTopBar v-if="foldersUiVisible && isMiddleScreen" />
+    <div class="flex min-h-0 w-full flex-1">
+      <FolderRail v-if="foldersUiVisible && !isMiddleScreen" />
+      <FolderManagerPanel v-if="foldersUiVisible && folderManagerOpen" />
+      <div
+        class="max-md:scrollbar-hidden h-full min-w-0 flex-1"
+        :class="disableProxiesPageScroll ? 'overflow-y-hidden' : 'overflow-y-scroll'"
+        :id="PROXIES_PAGE"
+        ref="proxiesRef"
+        @scroll.passive="handleScroll"
+      >
+        <template v-if="displayTwoColumns">
+          <div class="grid grid-cols-2 gap-3 p-3 md:pr-1">
+            <div
+              v-for="idx in [0, 1]"
+              :key="idx"
+              class="flex flex-1 flex-col gap-3"
+            >
+              <component
+                v-for="name in filterContent(renderPageItems, idx)"
+                :is="renderComponent"
+                :key="name"
+                :name="name"
+              />
+            </div>
+          </div>
+        </template>
         <div
-          v-for="idx in [0, 1]"
-          :key="idx"
-          class="flex flex-1 flex-col gap-3"
+          class="grid grid-cols-1 gap-3 p-3 md:pr-1"
+          v-else
         >
           <component
-            v-for="name in filterContent(renderPageItems, idx)"
+            v-for="name in renderPageItems"
             :is="renderComponent"
             :key="name"
             :name="name"
           />
         </div>
       </div>
-    </template>
-    <div
-      class="grid grid-cols-1 gap-3 p-3 md:pr-1"
-      v-else
-    >
-      <component
-        v-for="name in renderPageItems"
-        :is="renderComponent"
-        :key="name"
-        :name="name"
-      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import ProxiesCtrl from '@/components/controls/ProxiesCtrl'
+import FolderManagerPanel from '@/components/proxies/folders/FolderManagerPanel.vue'
+import FolderRail from '@/components/proxies/folders/FolderRail.vue'
+import FolderTopBar from '@/components/proxies/folders/FolderTopBar.vue'
 import ProxyGroup from '@/components/proxies/ProxyGroup.vue'
 import ProxyGroupForMobile from '@/components/proxies/ProxyGroupForMobile.vue'
 import ProxyProvider from '@/components/proxies/ProxyProvider.vue'
@@ -55,7 +65,12 @@ import {
 import { PROXY_TAB_TYPE } from '@/constant'
 import { isMiddleScreen, PROXIES_PAGE } from '@/helper/utils'
 import { fetchProxies, proxiesTabShow } from '@/store/proxies'
-import { disableProxiesPageTextSelect, twoColumnProxyGroup } from '@/store/settings'
+import {
+  disableProxiesPageTextSelect,
+  proxyFolderMode,
+  twoColumnProxyGroup,
+} from '@/store/settings'
+import { folderManagerOpen } from '@/store/proxyFolders'
 import { useSessionStorage } from '@vueuse/core'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 
@@ -124,6 +139,10 @@ const renderComponent = computed(() => {
 
   return ProxyGroup
 })
+
+const foldersUiVisible = computed(
+  () => proxyFolderMode.value && proxiesTabShow.value === PROXY_TAB_TYPE.PROXIES,
+)
 
 const displayTwoColumns = computed(() => {
   if (proxiesTabShow.value === PROXY_TAB_TYPE.PROVIDER && isMiddleScreen.value) {

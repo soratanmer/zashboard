@@ -135,6 +135,19 @@
           />
         </div>
         <div
+          v-if="isVisibleProxyFolderMode"
+          class="setting-item"
+        >
+          <div class="setting-item-label">
+            {{ $t('proxyFolderMode') }}
+          </div>
+          <input
+            class="toggle"
+            type="checkbox"
+            v-model="proxyFolderMode"
+          />
+        </div>
+        <div
           v-if="isVisibleTruncateProxyName"
           class="setting-item"
         >
@@ -277,6 +290,7 @@ import {
   speedtestTimeout,
   speedtestUrl,
   truncateProxyName,
+  proxyFolderMode,
   twoColumnProxyGroup,
 } from '@/store/settings'
 import { QuestionMarkCircleIcon } from '@heroicons/vue/24/outline'
@@ -296,6 +310,7 @@ const isVisibleIpv6Test = useIsSettingVisible(k.ipv6Test)
 const isVisibleIndependentLatencyTest = useIsSettingVisible(k.independentLatencyTest)
 const isVisibleGroupTestUrls = useIsSettingVisible(k.groupTestUrls)
 const isVisibleTwoColumnProxyGroup = useIsSettingVisible(k.twoColumnProxyGroup)
+const isVisibleProxyFolderMode = useIsSettingVisible(k.proxyFolderMode)
 const isVisibleTruncateProxyName = useIsSettingVisible(k.truncateProxyName)
 const isVisibleDisplayGlobalByMode = useIsSettingVisible(k.displayGlobalByMode)
 const isVisibleCustomGlobalNode = useIsSettingVisible(k.customGlobalNode)
@@ -334,6 +349,7 @@ const hasVisibleLatencyItems = computed(() => {
 const hasVisibleProxyStyleItems = computed(() => {
   return (
     isVisibleTwoColumnProxyGroup.value ||
+    isVisibleProxyFolderMode.value ||
     isVisibleTruncateProxyName.value ||
     isVisibleDisplayGlobalByMode.value ||
     (displayGlobalByMode.value && isSingBox.value && isVisibleCustomGlobalNode.value) ||

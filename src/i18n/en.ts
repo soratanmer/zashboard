@@ -358,6 +358,28 @@ const en = {
   RarelyUsed: 'Rarely used',
   OccasionalUsed: 'Occasionally used',
   MostUsed: 'Most used',
+
+  // Proxy folders
+  proxyFolderMode: 'Proxy folder mode',
+  folder_all: 'All',
+  folder_uncategorized: 'Uncategorized',
+  folder_manage: 'Manage folders',
+  folder_builtin_strategy: 'Strategy',
+  folder_builtin_nodes: 'Nodes',
+  folder_name: 'Folder name',
+  folder_new_placeholder: 'New folder name',
+  folder_rules: 'Auto rules',
+  folder_rule_auto: 'Auto',
+  folder_rule_regex: 'Regex',
+  folder_rule_exclude_regex: 'Exclude regex',
+  folder_auto_hasGroup: 'Contains sub-group',
+  folder_auto_nodeOnly: 'Nodes only',
+  folder_add_rule: 'Add rule',
+  folder_manual_includes: 'Manually included',
+  folder_filter_placeholder: 'Filter proxy groups',
+  folder_preview: 'Auto-matched groups',
+  folder_no_matches: 'No matched groups',
+  folder_delete_confirm: 'Delete folder "{name}"?',
 }
 
 export type LANG_MESSAGE = typeof en

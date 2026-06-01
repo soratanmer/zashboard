@@ -218,6 +218,7 @@ export const proxyGroupFilterMap = useStorage<Record<string, string>>(
 )
 export const displayFinalOutbound = useStorage('config/show-selected-for-now-node', false)
 export const twoColumnProxyGroup = useStorage('config/two-columns', true)
+export const proxyFolderMode = useStorage('config/proxy-folder-mode', false)
 export const speedtestUrl = useStorage<string>('config/speedtest-url', TEST_URL)
 export const independentLatencyTest = useStorage('config/independent-latency-test', false)
 export const speedtestTimeout = useStorage<number>('config/speedtest-timeout', 5000)
