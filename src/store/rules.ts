@@ -18,7 +18,7 @@ export const renderRules = computed(() => {
   }
 
   return rules.value.filter((rule) => {
-    return [rule.type, rule.payload, rule.proxy].some((metadata) => searchRegex.test(metadata))
+    return searchRegex.testAny([rule.type, rule.payload, rule.proxy])
   })
 })
 
@@ -30,9 +30,7 @@ export const renderRulesProvider = computed(() => {
   }
 
   return ruleProviderList.value.filter((ruleProvider) => {
-    return [ruleProvider.name, ruleProvider.behavior, ruleProvider.vehicleType].some((metadata) =>
-      searchRegex.test(metadata),
-    )
+    return searchRegex.testAny([ruleProvider.name, ruleProvider.behavior, ruleProvider.vehicleType])
   })
 })
 

@@ -29,7 +29,7 @@ const renderLogs = computed(() => {
 
   if (logFilter.value || logTypeFilter.value) {
     renderLogs = logs.value.filter((log) => {
-      if (searchRegex && ![log.payload, log.time, log.type].some((i) => searchRegex.test(i))) {
+      if (searchRegex && !searchRegex.testAny([log.payload, log.time, log.type])) {
         return false
       }
 
@@ -49,7 +49,7 @@ const renderLogs = computed(() => {
 
     if (hideRegex) {
       renderLogs = renderLogs.filter((log) => {
-        return ![log.payload, log.time, log.type].some((i) => hideRegex.test(i))
+        return !hideRegex.testAny([log.payload, log.time, log.type])
       })
     }
   }

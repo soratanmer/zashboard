@@ -199,7 +199,7 @@ export const renderConnections = computed(() => {
       }
 
       if (hideRegex) {
-        const quickFilterMatch = metadatas.some((i) => hideRegex.test(i))
+        const quickFilterMatch = hideRegex.testAny(metadatas)
 
         if (quickFilterMatch) {
           return false
@@ -207,7 +207,7 @@ export const renderConnections = computed(() => {
       }
 
       if (searchRegex) {
-        return metadatas.some((metadata) => searchRegex.test(metadata))
+        return searchRegex.testAny(metadatas)
       }
 
       return true
