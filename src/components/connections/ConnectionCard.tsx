@@ -130,41 +130,41 @@ export default defineComponent<{
           </span>
         ),
         [CONNECTIONS_TABLE_ACCESSOR_KEY.Download]: (
-          <div class="flex items-center gap-1 text-xs whitespace-nowrap">
+          <div class="flex items-center text-xs whitespace-nowrap">
             {highlightedText(CONNECTIONS_TABLE_ACCESSOR_KEY.Download)}
-            <ArrowDownIcon class="text-success h-3 w-3" />
+            <ArrowDownIcon class="text-success ml-1 h-3 w-3" />
           </div>
         ),
         [CONNECTIONS_TABLE_ACCESSOR_KEY.Upload]: (
-          <div class="flex items-center gap-1 text-xs whitespace-nowrap">
+          <div class="flex items-center text-xs whitespace-nowrap">
             {highlightedText(CONNECTIONS_TABLE_ACCESSOR_KEY.Upload)}
-            <ArrowUpIcon class="text-info h-3 w-3" />
+            <ArrowUpIcon class="text-info ml-1 h-3 w-3" />
           </div>
         ),
         [CONNECTIONS_TABLE_ACCESSOR_KEY.DlSpeed]: (
-          <div class="flex items-center gap-1 text-xs whitespace-nowrap">
+          <div class="flex items-center text-xs whitespace-nowrap">
             {highlightedText(CONNECTIONS_TABLE_ACCESSOR_KEY.DlSpeed)}
-            <ArrowDownCircleIcon class="text-success h-4 w-4" />
+            <ArrowDownCircleIcon class="text-success ml-1 h-4 w-4" />
           </div>
         ),
         [CONNECTIONS_TABLE_ACCESSOR_KEY.UlSpeed]: (
-          <div class="flex items-center gap-1 text-xs whitespace-nowrap">
+          <div class="flex items-center text-xs whitespace-nowrap">
             {highlightedText(CONNECTIONS_TABLE_ACCESSOR_KEY.UlSpeed)}
-            <ArrowUpCircleIcon class="text-info h-4 w-4" />
+            <ArrowUpCircleIcon class="text-info ml-1 h-4 w-4" />
           </div>
         ),
         [CONNECTIONS_TABLE_ACCESSOR_KEY.ConnectTime]: (
-          <div class="gap-1 whitespace-nowrap">
+          <div class="whitespace-nowrap">
             {highlightedText(CONNECTIONS_TABLE_ACCESSOR_KEY.ConnectTime)}
           </div>
         ),
         [CONNECTIONS_TABLE_ACCESSOR_KEY.DestinationType]: (
-          <div class="gap-1 whitespace-nowrap">
+          <div class="whitespace-nowrap">
             {highlightedText(CONNECTIONS_TABLE_ACCESSOR_KEY.DestinationType)}
           </div>
         ),
         [CONNECTIONS_TABLE_ACCESSOR_KEY.InboundUser]: (
-          <div class="gap-1 whitespace-nowrap">
+          <div class="whitespace-nowrap">
             {highlightedText(CONNECTIONS_TABLE_ACCESSOR_KEY.InboundUser)}
           </div>
         ),
