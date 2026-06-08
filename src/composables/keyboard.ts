@@ -159,9 +159,11 @@ export const useKeyboardShortcuts = () => {
   })
 
   const getShortcutKey = (action: string) => {
-    return (
-      normalizedCustomShortcuts.value[action] || normalizeShortcut(getDefaultShortcutKey(action))
-    )
+    if (action in normalizedCustomShortcuts.value) {
+      return normalizedCustomShortcuts.value[action]
+    }
+
+    return normalizeShortcut(getDefaultShortcutKey(action))
   }
 
   return {
