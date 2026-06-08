@@ -5,7 +5,7 @@
     :class="[disableProxiesPageTextSelect ? 'select-none' : '']"
   >
     <ProxiesCtrl />
-    <div class="flex min-h-0 w-full flex-1">
+    <div class="relative flex min-h-0 w-full flex-1">
       <FolderManagerPanel v-if="foldersUiVisible && folderManagerOpen" />
       <div
         class="max-md:scrollbar-hidden relative h-full min-w-0 flex-1"
