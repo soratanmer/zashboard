@@ -16,7 +16,7 @@
       >
         <FolderTopBar v-if="foldersUiVisible" />
         <template v-if="displayTwoColumns">
-          <div class="grid grid-cols-2 gap-3 p-3 md:pr-1">
+          <div class="grid grid-cols-2 gap-3 p-3 md:pr-2">
             <div
               v-for="idx in [0, 1]"
               :key="idx"
@@ -32,7 +32,7 @@
           </div>
         </template>
         <div
-          class="grid grid-cols-1 gap-3 p-3 md:pr-1"
+          class="grid grid-cols-1 gap-3 p-3 md:pr-2"
           v-else
         >
           <component
