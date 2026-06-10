@@ -27,9 +27,10 @@
 
       <div
         v-if="displayContent"
-        class="will-change-opacity max-h-108 w-full overflow-y-auto overscroll-contain transition-opacity duration-200 ease-out"
+        class="will-change-opacity max-h-108 overflow-y-auto overscroll-contain transition-opacity duration-200 ease-out"
         :class="[PROXIES_PARENT_CLASS]"
         :style="{
+          width: 'calc(100vw - 2.5rem)',
           opacity: contentOpacity,
           contain: 'layout style paint',
         }"
@@ -57,7 +58,6 @@ import ProxiesByProvider from './ProxiesByProvider.vue'
 import ProxiesContent from './ProxiesContent.vue'
 import ProxyGroupHeaderForMobile from './ProxyGroupHeaderForMobile.vue'
 
-const WIDTH_STYLE = 'calc(100vw - 1.5rem)'
 const props = defineProps<{
   name: string
 }>()
@@ -143,7 +143,7 @@ const calcCardStyle = () => {
     }
 
     cardStyle.value = {
-      width: WIDTH_STYLE,
+      width: 'calc(100vw - 1.5rem)',
       maxHeight: `${innerHeight - verticalOffset - 112}px`,
       transform: `translate3d(0, ${transformValueY}px, 0) scale(1)`,
       transformOrigin,

@@ -13,7 +13,6 @@
       <span class="shrink-0 whitespace-nowrap">{{ proxyGroup.type }} · {{ proxiesCount }}</span>
       <ProxyGroupFilter
         v-if="displayContent"
-        class="min-w-0 flex-1"
         :group-name="name"
       />
     </div>
