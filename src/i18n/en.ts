@@ -210,6 +210,7 @@ const en = {
   showLog: 'Show log',
   hideLogRegex: 'Hide log regex',
   hideLogTip: 'You can use case-insensitive regular expressions to match and hide unwanted logs.',
+  sameConnectionLogs: 'Logs of the same connection',
   loadBalance: 'Load balancing',
   label: 'Label',
   optional: 'Optional',
