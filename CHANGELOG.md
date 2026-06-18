@@ -2,6 +2,19 @@
 
 # Changelog
 
+## [3.11.0](https://github.com/Zephyruso/zashboard/compare/v3.10.1...v3.11.0) (2026-06-18)
+
+
+### Features
+
+* unify latency colors and refine neutral themes ([bcf44f3](https://github.com/Zephyruso/zashboard/commit/bcf44f30914b7b50a7f3f963f20519c47e15e70f))
+
+
+### Bug Fixes
+
+* enhance input and toggle styles for better user experience ([629a898](https://github.com/Zephyruso/zashboard/commit/629a8986432fb906e47ff24669290a9ffe754b9f))
+* prevent viewport panning on iOS by pinning scroll position ([953df88](https://github.com/Zephyruso/zashboard/commit/953df8811a04dc64b7c30b2898f3cfc5c6c24de1))
+
 ## [3.10.1](https://github.com/Zephyruso/zashboard/compare/v3.10.0...v3.10.1) (2026-06-17)
 
 
