@@ -1,0 +1,202 @@
+// sing-box native(gRPC daemon.StartedService)后端的代理「组装逻辑」。
+// 与 clash 的「拉取式」不同,这里是「流驱动」:订阅 SubscribeGroups / SubscribeOutbounds,
+// 每次推送直接重建 store/proxies.ts 的共享状态,因此选择/测速后无需手动刷新,
+// 结果会随流自动回填到 UI。
+
+import { disconnectByIdAPI } from '@/api'
+import { getSingboxClient } from '@/api/singbox/client'
+import { runStream, type StreamHandle } from '@/api/singbox/streams'
+import type { Group, GroupItem } from '@/gen/daemon/started_service_pb'
+import type { Proxy } from '@/types'
+import { activeConnections } from './connections'
+import { proxyGroupList, proxyMap, proxyProviederList } from './proxies'
+import { automaticDisconnection } from './settings'
+import { activeBackend } from './setup'
+
+const nodeToProxy = (item: GroupItem): Proxy => ({
+  name: item.tag,
+  type: item.type,
+  now: '',
+  history:
+    item.urlTestDelay > 0 ? [{ time: new Date().toISOString(), delay: item.urlTestDelay }] : [],
+  extra: {},
+  udp: true,
+  icon: '',
+})
+
+let groups = new Map<string, Group>()
+let outbounds = new Map<string, GroupItem>()
+let handles: StreamHandle[] = []
+let sessionKey = ''
+let ready: Promise<void> | null = null
+
+// 由流数据原生组装共享状态(无 clash 的 provider / GLOBAL / 排序等概念)。
+const rebuild = () => {
+  const proxies: Record<string, Proxy> = {}
+
+  // 1) 出站叶子节点(含延迟)
+  for (const item of outbounds.values()) {
+    proxies[item.tag] = nodeToProxy(item)
+  }
+  // 2) 用组内 items 补建缺失的叶子节点(outbounds 流可能晚到或不含某些成员)
+  for (const group of groups.values()) {
+    for (const item of group.items) {
+      if (!proxies[item.tag]) proxies[item.tag] = nodeToProxy(item)
+    }
+  }
+  // 3) 分组条目(携带 all / now),始终覆盖同名节点
+  for (const group of groups.values()) {
+    proxies[group.tag] = {
+      name: group.tag,
+      type: group.type,
+      now: group.selected,
+      all: group.items.map((i) => i.tag),
+      history: [],
+      extra: {},
+      udp: true,
+      icon: '',
+    }
+  }
+  // 4) 把组内 items 的延迟回填到叶子节点(绝不动带 all 的组条目)
+  for (const group of groups.values()) {
+    for (const item of group.items) {
+      const node = proxies[item.tag]
+      if (node && !node.all?.length && item.urlTestDelay > 0) {
+        node.history = [{ time: new Date().toISOString(), delay: item.urlTestDelay }]
+      }
+    }
+  }
+
+  proxyMap.value = proxies
+  proxyGroupList.value = Array.from(groups.values())
+    .filter((g) => g.items.length)
+    .map((g) => g.tag)
+  proxyProviederList.value = []
+}
+
+const closeStreams = () => {
+  handles.forEach((h) => h.close())
+  handles = []
+  sessionKey = ''
+  ready = null
+}
+
+const stop = () => {
+  closeStreams()
+  groups = new Map()
+  outbounds = new Map()
+}
+
+const runUnaryWithStreamsPaused = async <T>(task: () => Promise<T>) => {
+  // gRPC-Web server-streaming 在 HTTP/1.1 下会长期占用浏览器同源连接。
+  // URLTest / SelectOutbound 是 unary POST,若连接池被 groups/outbounds 等流占满,
+  // 请求会一直 pending。执行 unary 前先释放 proxies 的两条流,完成后再重建。
+  closeStreams()
+  try {
+    return await task()
+  } finally {
+    ensureSession()
+    if (ready) await ready
+  }
+}
+
+const ensureSession = () => {
+  const backend = activeBackend.value
+  const client = getSingboxClient()?.client
+  if (!backend || backend.type !== 'singbox' || !client) {
+    stop()
+    return
+  }
+  if (sessionKey === backend.uuid && handles.length) return
+
+  stop()
+  sessionKey = backend.uuid
+
+  let resolveReady!: () => void
+  let resolved = false
+  ready = new Promise<void>((r) => (resolveReady = r))
+
+  handles = [
+    runStream(
+      (signal) => client.subscribeGroups({}, { signal }),
+      (msg) => {
+        groups = new Map()
+        for (const g of msg.group) groups.set(g.tag, g)
+        rebuild()
+        if (!resolved) {
+          resolved = true
+          resolveReady()
+        }
+      },
+    ),
+    runStream(
+      (signal) => client.subscribeOutbounds({}, { signal }),
+      (msg) => {
+        outbounds = new Map()
+        for (const o of msg.outbounds) outbounds.set(o.tag, o)
+        rebuild()
+      },
+    ),
+  ]
+}
+
+// 在后端切换 / 登出时丢弃订阅。
+export const resetProxies = () => stop()
+
+export const fetchProxies = async () => {
+  ensureSession()
+  if (ready) await ready
+  rebuild()
+}
+
+export const handlerProxySelect = async (proxyGroupName: string, proxyName: string) => {
+  const client = getSingboxClient()?.client
+  if (!client) return
+
+  // 对齐 sing-box-dashboard: unary gRPC-Web POST /daemon.StartedService/SelectOutbound
+  await runUnaryWithStreamsPaused(() =>
+    client.selectOutbound({ groupTag: proxyGroupName, outboundTag: proxyName }),
+  )
+
+  // 乐观更新,流随后会确认
+  const group = groups.get(proxyGroupName)
+  if (group) {
+    group.selected = proxyName
+    rebuild()
+  }
+
+  if (automaticDisconnection.value) {
+    activeConnections.value
+      .filter((c) => c.chains.includes(proxyGroupName))
+      .forEach((c) => disconnectByIdAPI(c.id))
+  }
+}
+
+// sing-box native API 的 URLTest 是组级别;节点卡片触发测速时转为所在组测速。
+export const proxyLatencyTest = async (
+  proxyName: string,
+  _url?: string,
+  _timeout?: number,
+  groupName?: string,
+) => {
+  const client = getSingboxClient()?.client
+  if (!client) return
+  await runUnaryWithStreamsPaused(() => client.uRLTest({ outboundTag: groupName || proxyName }))
+}
+
+export const proxyGroupLatencyTest = async (proxyGroupName: string) => {
+  const client = getSingboxClient()?.client
+  if (!client) return
+  // 对齐 sing-box-dashboard: unary gRPC-Web POST /daemon.StartedService/URLTest
+  await runUnaryWithStreamsPaused(() => client.uRLTest({ outboundTag: proxyGroupName }))
+}
+
+export const allProxiesLatencyTest = async () => {
+  const client = getSingboxClient()?.client
+  if (!client) return
+  await runUnaryWithStreamsPaused(() =>
+    Promise.allSettled(
+      Array.from(groups.keys()).map((tag) => client.uRLTest({ outboundTag: tag })),
+    ),
+  )
+}
